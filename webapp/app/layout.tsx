@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'ReceiptsAI — Gestión de Comprobantes',
@@ -14,7 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <AuthGuard>{children}</AuthGuard>
+      </body>
     </html>
   );
 }
