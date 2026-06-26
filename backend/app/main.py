@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import init_db
-from app.routers import webhooks, auth, receipts, drivers
+from app.routers import auth, receipts, drivers
 
 # --- Logging setup ---
 logging.basicConfig(
@@ -50,7 +50,6 @@ app.add_middleware(
 )
 
 # --- Routers ---
-app.include_router(webhooks.router)
 app.include_router(auth.router)
 app.include_router(receipts.router)
 app.include_router(drivers.router)
