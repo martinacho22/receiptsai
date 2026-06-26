@@ -9,10 +9,23 @@ async function renderDashboard(container) {
   container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando dashboard...</div>';
 
   try {
-    const [summary, receipts] = await Promise.all([
-      apiCall('/receipts/summary'),
-      apiCall('/receipts', { params: { limit: 200 } }),
-    ]);
+    // Fetch summary and receipts in parallel; if either fails, show zeros gracefully
+    let summary = { total_pending: 0, total_approved: 0, total_paid: 0, pending_amount: 0, approved_amount: 0, paid_amount: 0 };
+    let receipts = [];
+
+    try {
+      const s = await apiCall('/receipts/summary');
+      if (s) summary = s;
+    } catch {
+      // Summary might 404 if no tenant data yet; show zeros
+    }
+
+    try {
+      const r = await apiCall('/receipts', { params: { limit: 200 } });
+      if (r) receipts = r;
+    } catch {
+      // No receipts yet
+    }
 
     // Compute per-driver totals client-side
     const driverTotals = {};
@@ -37,6 +50,7 @@ async function renderDashboard(container) {
     });
 
     const driverArray = Object.values(driverTotals);
+    const totalCount = (receipts || []).length;
 
     container.innerHTML = `
       <h1 class="page-title">Dashboard</h1>
@@ -60,8 +74,8 @@ async function renderDashboard(container) {
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Conductores activos</div>
-          <div class="kpi-value" style="color:var(--text)">${driverArray.length}</div>
-          <div class="kpi-sub">${(receipts || []).length} comprobantes totales</div>
+          <div class="kpi-value" style="color:var(--text)">${driverArray.length || '—'}</div>
+          <div class="kpi-sub">${totalCount} comprobantes totales</div>
         </div>
       </div>
 
@@ -79,7 +93,7 @@ async function renderDashboard(container) {
             </tr>
           </thead>
           <tbody>
-            ${driverArray.length === 0 ? '<tr><td colspan="6" class="text-center" style="color:var(--text-muted);padding:32px;">No hay datos de conductores</td></tr>' : ''}
+            ${driverArray.length === 0 ? '<tr><td colspan="6" class="text-center" style="color:var(--text-muted);padding:32px;">No hay datos de conductores — los comprobantes aparecerán aquí cuando los empleados envíen recibos</td></tr>' : ''}
             ${driverArray.map(d => `
               <tr>
                 <td class="font-semibold">${escapeHtml(d.driver_name)}</td>
