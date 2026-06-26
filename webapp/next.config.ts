@@ -1,15 +1,1 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "standalone",
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:8000/api/:path*",
-      },
-    ];
-  },
-};
-
-export default nextConfig;
+This file was renamed to next.config.mjs — next.config.ts is not supported by Next.js 14.
