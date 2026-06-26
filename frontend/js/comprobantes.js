@@ -47,7 +47,7 @@ async function renderComprobantes(container) {
           </thead>
           <tbody id="receiptsBody">
             ${receiptsList.length === 0
-              ? '<tr><td colspan="8" class="text-center" style="color:var(--text-muted);padding:32px;">No hay comprobantes</td></tr>'
+              ? '<tr><td colspan="8" class="text-center" style="color:var(--text-muted);padding:32px;">No hay comprobantes registrados</td></tr>'
               : receiptsList.map(r => `
                 <tr class="receipt-row" data-id="${r.id}">
                   <td class="font-mono">${r.id.slice(0, 8)}</td>
@@ -122,9 +122,11 @@ async function renderComprobantes(container) {
       modalFooter.innerHTML = renderReceiptActions(receipt);
       modal.classList.add('active');
 
-      // Action buttons
+      // Action buttons — disable after first click to prevent double-submit
       modalFooter.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', async () => {
+          btn.disabled = true;
+          btn.textContent = 'Procesando...';
           const action = btn.dataset.action;
           const notesInput = document.getElementById('rejectionNotes');
           const notes = notesInput ? notesInput.value.trim() : '';
@@ -134,6 +136,8 @@ async function renderComprobantes(container) {
 
       // Close modal
       document.getElementById('modalClose').addEventListener('click', closeModal);
+      const closeBtn = document.getElementById('modalCloseBtn');
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
       modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
       });
@@ -180,9 +184,6 @@ function renderReceiptDetail(r) {
         }
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
           <span class="badge ${r.status}">${r.status}</span>
-          <span class="badge" style="background:var(--bg);color:var(--text);">
-            Confianza: ${r.confidence || '—'}
-          </span>
         </div>
       </div>
       <div>
@@ -207,10 +208,6 @@ function renderReceiptDetail(r) {
         <div class="form-group">
           <label>Empleado</label>
           <div class="form-input" style="background:var(--bg);cursor:default;">${escapeHtml(r.driver_name || '—')}</div>
-        </div>
-        <div class="form-group">
-          <label>ID del conductor</label>
-          <div class="form-input" style="background:var(--bg);cursor:default;font-family:mono;font-size:0.8rem;">${r.driver_id || '—'}</div>
         </div>
         <div class="form-group">
           <label>Subido</label>
@@ -244,8 +241,6 @@ function renderReceiptActions(r) {
   } else if (r.status === 'approved') {
     actions.push('<button class="btn btn-primary" data-action="paid">💰 Marcar como pagado</button>');
     actions.push('<button class="btn btn-outline" data-action="rejected">✗ Rechazar</button>');
-  } else if (r.status === 'rejected' && false) {
-    // Could re-open, but API doesn't support going back
   }
   actions.push('<button class="btn btn-outline" id="modalCloseBtn">Cerrar</button>');
   return actions.join(' ');
