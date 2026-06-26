@@ -9,10 +9,9 @@
   <link rel="stylesheet" href="css/styles.css" />
   <!-- Config: override API_BASE by setting this variable before api.js loads -->
   <script>
-    // Change this URL to point to your backend
     window.__RECEIPTSAI_API_URL__ = window.location.origin === 'file://'
-      ? 'http://localhost:8000'
-      : (window.location.origin + '/api');
+      ? 'http://localhost:8001'
+      : window.location.origin;
   </script>
 </head>
 <body>
