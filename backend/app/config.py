@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     secret_key: str = "change-me"
 
-    # Database
-    database_url: str = "postgresql+asyncpg://localhost:5432/receiptsai"
+    # Database — defaults to SQLite for local dev; override via .env for PostgreSQL
+    database_url: str = "sqlite+aiosqlite:///./receiptsai.db"
 
     # Twilio
     twilio_account_sid: str = ""
