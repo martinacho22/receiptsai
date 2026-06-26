@@ -28,12 +28,17 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
+class UserInfo(BaseModel):
+    id: str
+    tenant_id: str
+    company_name: str
+    role: str
+
+
+class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    user_id: str
-    tenant_id: str
-    role: str
+    user: UserInfo
 
 
 # --- Routes ---
@@ -78,9 +83,26 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
         password_hash=hash_password(req.password),
     )
     db.add(admin)
+    await db.flush()
+
+    # Generate JWT so user is logged in immediately after registration
+    token = create_access_token(
+        user_id=admin.id,
+        tenant_id=admin.tenant_id,
+        role=admin.role,
+    )
+
     await db.commit()
 
-    return {"message": "Company registered successfully", "tenant_id": str(tenant.id)}
+    return AuthResponse(
+        access_token=token,
+        user=UserInfo(
+            id=str(admin.id),
+            tenant_id=str(admin.tenant_id),
+            company_name=tenant.name,
+            role=admin.role,
+        ),
+    )
 
 
 @router.post("/login")
@@ -103,9 +125,18 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
         role=user.role,
     )
 
-    return TokenResponse(
+    # Fetch tenant name for response
+    tenant_result = await db.execute(
+        select(Tenant).where(Tenant.id == user.tenant_id)
+    )
+    tenant = tenant_result.scalar_one_or_none()
+
+    return AuthResponse(
         access_token=token,
-        user_id=str(user.id),
-        tenant_id=str(user.tenant_id),
-        role=user.role,
+        user=UserInfo(
+            id=str(user.id),
+            tenant_id=str(user.tenant_id),
+            company_name=tenant.name if tenant else "",
+            role=user.role,
+        ),
     )
