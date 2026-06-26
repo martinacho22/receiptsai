@@ -3,471 +3,309 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Concretera del Bajío — ReceiptsAI · Control de Combustible</title>
+<title>Autotransportes del Norte S.A. de C.V. — ReceiptsAI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  :root {
-    --p: #0d7675; --p-hover: #095c5b; --p-light: #e8f5f5;
-    --s: #f7f5f2; --w: #ffffff; --b: #1a1a2e;
-    --g-50:#f9fafb; --g-100:#f3f4f6; --g-200:#e5e7eb; --g-300:#d1d5db;
-    --g-400:#9ca3af; --g-500:#6b7280; --g-600:#4b5563; --g-700:#374151;
-    --amber:#d97706; --amber-bg:#fffbeb; --red:#dc2626; --red-bg:#fef2f2;
-    --green:#059669; --blue:#2563eb;
-    --radius:12px; --radius-sm:8px;
-    --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-    --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
-    --font:'Inter',system-ui,-apple-system,sans-serif;
-  }
-  html { font-size:16px; }
-  body { font-family:var(--font); background:var(--s); color:var(--b); min-height:100vh; }
-  .app { display:flex; min-height:100vh; }
-  /* ── Sidebar ── */
-  .sidebar { width:240px; background:var(--w); border-right:1px solid var(--g-200); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; }
-  .sidebar-brand { padding:20px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--g-200); }
-  .sidebar-brand svg { color:var(--p); }
-  .sidebar-brand span { font-weight:600; font-size:16px; color:var(--b); }
-  .sidebar-brand small { font-size:11px; color:var(--g-400); display:block; margin-top:-2px; }
-  .sidebar-nav { flex:1; padding:12px 8px; display:flex; flex-direction:column; gap:2px; }
-  .sidebar-nav a { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius-sm); text-decoration:none; color:var(--g-600); font-size:14px; font-weight:500; transition:.15s; cursor:pointer; }
-  .sidebar-nav a:hover { background:var(--g-100); }
-  .sidebar-nav a.active { background:var(--p-light); color:var(--p); font-weight:600; }
-  .sidebar-nav a svg { width:20px; height:20px; flex-shrink:0; }
-  .sidebar-footer { padding:16px; border-top:1px solid var(--g-200); font-size:12px; color:var(--g-400); text-align:center; }
-  /* ── Main ── */
-  .main { flex:1; min-width:0; overflow-y:auto; }
-  .topbar { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:var(--w); border-bottom:1px solid var(--g-200); position:sticky; top:0; z-index:10; }
-  .topbar h1 { font-size:20px; font-weight:600; color:var(--b); }
-  .topbar-right { display:flex; align-items:center; gap:12px; }
-  .topbar-right .company-badge { font-size:13px; color:var(--g-500); background:var(--g-100); padding:6px 12px; border-radius:20px; }
-  .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:var(--radius-sm); font-size:14px; font-weight:500; border:none; cursor:pointer; transition:.15s; text-decoration:none; }
-  .btn-primary { background:var(--p); color:var(--w); }
-  .btn-primary:hover { background:var(--p-hover); }
-  .btn-outline { background:transparent; color:var(--g-600); border:1px solid var(--g-300); }
-  .btn-outline:hover { background:var(--g-50); }
-  .btn-sm { padding:6px 12px; font-size:13px; }
-  .btn-icon { width:36px; height:36px; padding:0; justify-content:center; border-radius:50%; }
-  .btn-danger { background:var(--red); color:var(--w); }
-  .btn-danger:hover { opacity:.9; }
-  .btn-success { background:var(--green); color:var(--w); }
-  .btn-success:hover { opacity:.9; }
-  .content { padding:24px; }
-  /* ── KPI Cards ── */
-  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
-  .kpi-card { background:var(--w); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
-  .kpi-card .kpi-label { font-size:13px; color:var(--g-500); margin-bottom:4px; }
-  .kpi-card .kpi-value { font-size:28px; font-weight:700; color:var(--b); }
-  .kpi-card .kpi-sub { font-size:13px; color:var(--g-400); margin-top:4px; }
-  .kpi-card .kpi-icon { float:right; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
-  .kpi-card .kpi-icon.teal { background:var(--p-light); color:var(--p); }
-  .kpi-card .kpi-icon.amber { background:var(--amber-bg); color:var(--amber); }
-  .kpi-card .kpi-icon.red { background:var(--red-bg); color:var(--red); }
-  .kpi-card .kpi-icon.green { background:#ecfdf5; color:var(--green); }
-  .kpi-card .kpi-icon.blue { background:#eff6ff; color:var(--blue); }
-  /* ── Tables ── */
-  .card { background:var(--w); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:24px; overflow:hidden; }
-  .card-header { padding:16px 20px; border-bottom:1px solid var(--g-200); display:flex; justify-content:space-between; align-items:center; }
-  .card-header h2 { font-size:16px; font-weight:600; }
-  .card-body { padding:0; overflow-x:auto; }
-  table { width:100%; border-collapse:collapse; font-size:14px; }
-  th { text-align:left; padding:12px 16px; font-weight:600; color:var(--g-500); font-size:12px; text-transform:uppercase; letter-spacing:.03em; border-bottom:1px solid var(--g-200); background:var(--g-50); }
-  td { padding:12px 16px; border-bottom:1px solid var(--g-100); vertical-align:middle; }
-  tr:last-child td { border-bottom:none; }
-  tr:hover td { background:var(--g-50); }
-  .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:500; }
-  .badge-paid { background:#ecfdf5; color:var(--green); }
-  .badge-pending { background:var(--amber-bg); color:var(--amber); }
-  .badge-review { background:#f0f0ff; color:#6366f1; }
-  .badge-overdue { background:var(--red-bg); color:var(--red); }
-  .badge-verified { background:var(--p-light); color:var(--p); }
-  .badge-low { background:var(--amber-bg); color:var(--amber); }
-  .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
-  .status-dot.green { background:var(--green); }
-  .status-dot.amber { background:var(--amber); }
-  .status-dot.red { background:var(--red); }
-  /* ── Empty state ── */
-  .empty-state { text-align:center; padding:60px 20px; color:var(--g-400); }
-  .empty-state svg { width:64px; height:64px; color:var(--g-300); margin-bottom:16px; }
-  .empty-state p { font-size:16px; margin-bottom:8px; }
-  .empty-state small { font-size:13px; }
-  /* ── Modal ── */
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:var(--w); border-radius:var(--radius); max-width:640px; width:90%; max-height:85vh; overflow-y:auto; box-shadow:var(--shadow-md); }
-  .modal-header { padding:20px 24px; border-bottom:1px solid var(--g-200); display:flex; justify-content:space-between; align-items:center; }
-  .modal-header h2 { font-size:18px; font-weight:600; }
-  .modal-close { background:none; border:none; font-size:24px; color:var(--g-400); cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
-  .modal-close:hover { background:var(--g-100); }
-  .modal-body { padding:24px; }
-  .modal-footer { padding:16px 24px; border-top:1px solid var(--g-200); display:flex; justify-content:flex-end; gap:8px; }
-  .modal-footer .btn { min-width:80px; justify-content:center; }
-  /* ── Conf. badge ── */
-  .conf-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
-  .conf-high { background:#ecfdf5; color:var(--green); }
-  .conf-med { background:var(--amber-bg); color:var(--amber); }
-  .conf-low { background:var(--red-bg); color:var(--red); }
-  /* ── Detail row ── */
-  .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--g-100); }
-  .detail-row:last-child { border-bottom:none; }
-  .detail-label { color:var(--g-500); font-size:14px; }
-  .detail-value { font-weight:500; font-size:14px; text-align:right; }
-  /* ── Section ── */
-  .section-title { font-size:14px; font-weight:600; color:var(--g-700); margin:20px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--g-200); }
-  .section-title:first-child { margin-top:0; }
-  /* ── Pricing cards ── */
-  .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
-  .pricing-card { background:var(--w); border:1px solid var(--g-200); border-radius:var(--radius); padding:20px; text-align:center; transition:.15s; }
-  .pricing-card:hover { border-color:var(--p); box-shadow:var(--shadow-md); }
-  .pricing-card.featured { border-color:var(--p); background:var(--p-light); }
-  .pricing-card .plan-name { font-size:14px; font-weight:600; color:var(--g-700); margin-bottom:4px; }
-  .pricing-card .plan-price { font-size:24px; font-weight:700; color:var(--b); }
-  .pricing-card .plan-price small { font-size:14px; font-weight:400; color:var(--g-400); }
-  .pricing-card .plan-desc { font-size:13px; color:var(--g-500); margin-top:8px; }
-  .pricing-card .plan-features { list-style:none; margin-top:12px; text-align:left; }
-  .pricing-card .plan-features li { padding:4px 0; font-size:13px; color:var(--g-600); display:flex; align-items:center; gap:6px; }
-  .pricing-card .plan-features li::before { content:'✓'; color:var(--green); font-weight:700; }
-  /* ── Confirm dialog ── */
-  .confirm-dialog { text-align:center; padding:20px; }
-  .confirm-dialog .confirm-icon { width:56px; height:56px; border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; }
-  .confirm-dialog .confirm-icon.success { background:#ecfdf5; color:var(--green); }
-  .confirm-dialog h3 { font-size:18px; margin-bottom:8px; }
-  .confirm-dialog p { color:var(--g-500); font-size:14px; margin-bottom:4px; }
-  /* ── Tabs ── */
-  .tabs { display:flex; gap:0; border-bottom:1px solid var(--g-200); margin-bottom:20px; }
-  .tab { padding:10px 20px; font-size:14px; font-weight:500; color:var(--g-500); cursor:pointer; border-bottom:2px solid transparent; transition:.15s; background:none; border-top:none; border-left:none; border-right:none; }
-  .tab:hover { color:var(--b); }
-  .tab.active { color:var(--p); border-bottom-color:var(--p); }
-  .tab-content { display:none; }
-  .tab-content.active { display:block; }
-  /* ── Search ── */
-  .search-bar { display:flex; align-items:center; gap:8px; background:var(--g-50); border:1px solid var(--g-200); border-radius:var(--radius-sm); padding:8px 12px; width:280px; }
-  .search-bar input { border:none; background:transparent; outline:none; font-size:14px; color:var(--b); width:100%; }
-  .search-bar input::placeholder { color:var(--g-400); }
-  .search-bar svg { width:18px; height:18px; color:var(--g-400); flex-shrink:0; }
-  .flex { display:flex; }
-  .flex-col { flex-direction:column; }
-  .items-center { align-items:center; }
-  .justify-between { justify-content:space-between; }
-  .gap-2 { gap:8px; }
-  .gap-3 { gap:12px; }
-  .gap-4 { gap:16px; }
-  .mt-4 { margin-top:16px; }
-  .mb-4 { margin-bottom:16px; }
-  .mb-2 { margin-bottom:8px; }
-  .text-sm { font-size:13px; color:var(--g-500); }
-  .text-xs { font-size:12px; color:var(--g-400); }
-  .font-medium { font-weight:500; }
-  .font-semibold { font-weight:600; }
-  .text-right { text-align:right; }
-  @media(max-width:768px) {
-    .sidebar { display:none; }
-    .sidebar.mobile-open { display:flex; position:fixed; inset:0; z-index:50; width:100%; height:100vh; }
-    .content { padding:16px; }
-    .kpi-grid { grid-template-columns:1fr 1fr; }
-    .topbar { padding:12px 16px; }
-    .search-bar { width:100%; }
-    .pricing-grid { grid-template-columns:1fr; }
-    .modal { width:95%; }
-    .mobile-menu-btn { display:flex !important; }
-  }
-  @media(min-width:769px) {
-    .mobile-menu-btn { display:none; }
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--p:#0b7060;--p-hover:#085c4f;--p-light:#e6f2ef;
+--paper:#f7f3ee;--paper-card:#fcf9f6;--w:#fff;
+--text:#2d2a24;--text-sec:#8b8070;
+--g-50:#faf8f5;--g-100:#f0ece6;--g-200:#e2dcd2;--g-300:#cdc4b6;
+--g-400:#a89e8f;--g-500:#8b8070;--g-600:#6b6255;--g-700:#4a443b;
+--amber:#b8863a;--amber-bg:#faf1e0;
+--red:#b8433a;--red-bg:#fce8e6;
+--green:#3a8a6b;--green-bg:#e6f4ed;
+--blue:#3a6bb8;
+--radius:12px;--radius-sm:8px;
+--shadow-sm:0 1px 2px rgba(45,42,36,.06);
+--shadow:0 1px 3px rgba(45,42,36,.08),0 1px 2px rgba(45,42,36,.04);
+--shadow-md:0 4px 6px rgba(45,42,36,.07),0 2px 4px rgba(45,42,36,.06);
+--font:'Inter',system-ui,-apple-system,sans-serif
+}
+html{background-color:#f7f3ee;background-image:radial-gradient(ellipse at 20% 0%,rgba(202,168,126,.10) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(202,168,126,.07) 0%,transparent 60%),repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(139,128,112,.02) 1px,rgba(139,128,112,.02) 2px);background-attachment:fixed}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:transparent;color:#2d2a24;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#fcf9f6;border-right:1px solid #e2dcd2;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;background-image:radial-gradient(circle at 1px 1px,rgba(139,128,112,.04) 1px,transparent 0);background-size:3px 3px}
+.sidebar-brand{padding:20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e2dcd2}
+.sidebar-brand svg{color:#0b7060}
+.sidebar-brand span{font-weight:600;font-size:15px;color:#2d2a24}
+.sidebar-brand small{font-size:10px;color:#a89e8f;display:block;margin-top:-2px;letter-spacing:.3px}
+.sidebar-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;text-decoration:none;color:#6b6255;font-size:14px;font-weight:500;transition:all .15s;cursor:pointer;min-height:44px}
+.sidebar-nav a:hover{background:#f0ece6;color:#2d2a24}
+.sidebar-nav a.active{background:#e6f2ef;color:#0b7060;font-weight:600}
+.sidebar-nav a.active svg{stroke:#0b7060}
+.sidebar-nav a svg{width:20px;height:20px;flex-shrink:0}
+.sidebar-footer{padding:16px;border-top:1px solid #e2dcd2;font-size:11px;color:#a89e8f;text-align:center}
+.main{flex:1;min-width:0;overflow-y:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#fcf9f6;border-bottom:1px solid #e2dcd2;position:sticky;top:0;z-index:10;background-image:radial-gradient(circle at 1px 1px,rgba(139,128,112,.03) 1px,transparent 0);background-size:4px 4px}
+.topbar h1{font-size:20px;font-weight:600;color:#2d2a24}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-right .company-badge{font-size:12px;color:#8b8070;background:#faf8f5;padding:6px 12px;border-radius:20px;border:1px solid #e2dcd2}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;border:none;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-primary{background:#0b7060;color:#fff}
+.btn-primary:hover{background:#085c4f}
+.btn-outline{background:transparent;color:#6b6255;border:1px solid #cdc4b6}
+.btn-outline:hover{background:#faf8f5}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn-icon{width:36px;height:36px;padding:0;justify-content:center;border-radius:50%}
+.btn-danger{background:#fce8e6;color:#b8433a}
+.btn-success{background:#e6f4ed;color:#3a8a6b}
+.content{padding:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.kpi-card{background:#fcf9f6;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(45,42,36,.08),0 1px 2px rgba(45,42,36,.04);border:1px solid #f0ece6;background-image:radial-gradient(circle at 1px 1px,rgba(139,128,112,.03) 1px,transparent 0);background-size:4px 4px}
+.kpi-card .kpi-label{font-size:12px;color:#8b8070;margin-bottom:4px;letter-spacing:.3px;text-transform:uppercase;font-weight:500}
+.kpi-card .kpi-value{font-size:26px;font-weight:700;color:#2d2a24}
+.kpi-card .kpi-sub{font-size:12px;color:#a89e8f;margin-top:4px}
+.kpi-card .kpi-icon{float:right;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.kpi-card .kpi-icon.teal{background:#e6f2ef;color:#0b7060}
+.kpi-card .kpi-icon.amber{background:#faf1e0;color:#b8863a}
+.kpi-card .kpi-icon.red{background:#fce8e6;color:#b8433a}
+.kpi-card .kpi-icon.green{background:#e6f4ed;color:#3a8a6b}
+.card{background:#fcf9f6;border-radius:12px;box-shadow:0 1px 3px rgba(45,42,36,.08),0 1px 2px rgba(45,42,36,.04);margin-bottom:24px;overflow:hidden;border:1px solid #f0ece6;background-image:radial-gradient(circle at 1px 1px,rgba(139,128,112,.03) 1px,transparent 0);background-size:4px 4px}
+.card-header{padding:16px 20px;border-bottom:1px solid #e2dcd2;display:flex;justify-content:space-between;align-items:center}
+.card-header h2{font-size:15px;font-weight:600;color:#2d2a24}
+.card-body{padding:0;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:12px 16px;font-weight:600;color:#8b8070;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2dcd2;background:#faf8f5}
+td{padding:12px 16px;border-bottom:1px solid #f0ece6;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf8f5}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500}
+.badge-paid{background:#e6f4ed;color:#3a8a6b}
+.badge-pending{background:#faf1e0;color:#b8863a}
+.badge-review{background:#eef2ff;color:#3a6bb8}
+.badge-overdue{background:#fce8e6;color:#b8433a}
+.badge-verified{background:#e6f2ef;color:#0b7060}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-dot.green{background:#3a8a6b}
+.status-dot.amber{background:#b8863a}
+.status-dot.red{background:#b8433a}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(45,42,36,.45);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:#fcf9f6;border-radius:12px;max-width:640px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(45,42,36,.18);background-image:radial-gradient(circle at 1px 1px,rgba(139,128,112,.03) 1px,transparent 0);background-size:4px 4px}
+.modal-header{padding:20px 24px;border-bottom:1px solid #e2dcd2;display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-size:17px;font-weight:600}
+.modal-close{background:none;border:none;font-size:22px;color:#a89e8f;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.modal-close:hover{background:#f0ece6}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid #e2dcd2;display:flex;justify-content:flex-end;gap:8px}
+.conf-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.conf-high{background:#e6f4ed;color:#3a8a6b}
+.conf-med{background:#faf1e0;color:#b8863a}
+.conf-low{background:#fce8e6;color:#b8433a}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0ece6}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:#8b8070;font-size:14px}
+.detail-value{font-weight:500;font-size:14px;text-align:right}
+.section-title{font-size:13px;font-weight:600;color:#6b6255;margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid #e2dcd2;letter-spacing:.3px;text-transform:uppercase}
+.section-title:first-child{margin-top:0}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.pricing-card{background:#fcf9f6;border:1px solid #e2dcd2;border-radius:12px;padding:20px;text-align:center;transition:all .15s}
+.pricing-card:hover{border-color:#0b7060;box-shadow:0 4px 6px rgba(45,42,36,.07),0 2px 4px rgba(45,42,36,.06)}
+.pricing-card.featured{border-color:#0b7060;background:#e6f2ef}
+.pricing-card .plan-name{font-size:14px;font-weight:600;color:#6b6255;margin-bottom:4px}
+.pricing-card .plan-price{font-size:24px;font-weight:700;color:#2d2a24}
+.pricing-card .plan-price small{font-size:13px;font-weight:400;color:#a89e8f}
+.pricing-card .plan-desc{font-size:12px;color:#8b8070;margin-top:8px}
+.pricing-card .plan-features{list-style:none;margin-top:12px;text-align:left}
+.pricing-card .plan-features li{padding:4px 0;font-size:12px;color:#6b6255;display:flex;align-items:center;gap:6px}
+.pricing-card .plan-features li::before{content:'\2713';color:#3a8a6b;font-weight:700;margin-right:4px}
+.confirm-dialog{text-align:center;padding:20px}
+.confirm-dialog .confirm-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.confirm-dialog .confirm-icon.success{background:#e6f4ed;color:#3a8a6b}
+.confirm-dialog h3{font-size:17px;margin-bottom:8px}
+.confirm-dialog p{color:#8b8070;font-size:14px;margin-bottom:4px}
+.search-bar{display:flex;align-items:center;gap:8px;background:#faf8f5;border:1px solid #e2dcd2;border-radius:8px;padding:8px 12px;width:280px}
+.search-bar input{border:none;background:transparent;outline:none;font-size:14px;color:#2d2a24;width:100%}
+.search-bar input::placeholder{color:#a89e8f}
+.search-bar svg{width:18px;height:18px;color:#a89e8f;flex-shrink:0}
+.flex{display:flex}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.gap-2{gap:8px}
+.gap-3{gap:12px}
+.gap-4{gap:16px}
+.mt-4{margin-top:16px}
+.mb-4{margin-bottom:16px}
+.text-sm{font-size:12px;color:#8b8070}
+.text-xs{font-size:11px;color:#a89e8f}
+.font-medium{font-weight:500}
+.font-semibold{font-weight:600}
+select{padding:8px 12px;border:1px solid #e2dcd2;border-radius:8px;font-size:13px;background:#fcf9f6;color:#2d2a24;font-family:'Inter',system-ui,-apple-system,sans-serif}
+@media(max-width:768px){.sidebar{display:none}.sidebar.mobile-open{display:flex;position:fixed;inset:0;z-index:50;width:100%;height:100vh}.content{padding:16px}.kpi-grid{grid-template-columns:1fr 1fr}.topbar{padding:12px 16px}.search-bar{width:100%}.pricing-grid{grid-template-columns:1fr}.modal{width:95%}.mobile-menu-btn{display:flex!important}}
+@media(min-width:769px){.mobile-menu-btn{display:none}}
 </style>
 </head>
 <body>
 <div class="app" id="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M19 9l-5 5-4-4-3 3"/></svg>
-      <div><span>ReceiptsAI</span><small>Control de Combustible</small></div>
-    </div>
-    <nav class="sidebar-nav" id="sidebar-nav">
-      <a class="active" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Dashboard</a>
-      <a data-page="a-pagar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> A Pagar</a>
-      <a data-page="comprobantes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Comprobantes</a>
-      <a data-page="conductores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg> Conductores</a>
-      <a data-page="configuracion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configuración</a>
-    </nav>
-    <div class="sidebar-footer">ReceiptsAI v2.0 · Demo</div>
-  </aside>
-  <div class="main" id="main">
-    <div class="topbar">
-      <div class="flex items-center gap-3">
-        <button class="mobile-menu-btn btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
-        <h1 id="page-title">Dashboard</h1>
-      </div>
-      <div class="topbar-right">
-        <span class="company-badge">Concretera del Bajío</span>
-      </div>
-    </div>
-    <div class="content" id="page-content"></div>
-  </div>
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-brand">
+<svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="24" height="18" rx="2"/><path d="M16 4v4M10 4v4M22 4v4"/><path d="M10 14h12M10 18h8M10 22h4"/></svg>
+<div><span>ReceiptsAI</span><small>Control de Combustible</small></div>
+</div>
+<nav class="sidebar-nav" id="sidebar-nav">
+<a class="active" data-page="dashboard"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Dashboard</a>
+<a data-page="a-pagar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> A Pagar</a>
+<a data-page="comprobantes"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Comprobantes</a>
+<a data-page="conductores"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg> Conductores</a>
+<a data-page="configuracion"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configuracion</a>
+</nav>
+<div class="sidebar-footer">ReceiptsAI v3.0 · Premium Demo</div>
+</aside>
+<div class="main" id="main">
+<div class="topbar">
+<div class="flex items-center gap-3">
+<button class="mobile-menu-btn btn btn-icon" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<h1 id="page-title">Dashboard</h1>
+</div>
+<div class="topbar-right"><span class="company-badge">Autotransportes del Norte S.A. de C.V.</span></div>
+</div>
+<div class="content" id="page-content"></div>
+</div>
 </div>
 
 <script>
-// ─── DATA ──────────────────────────────────────────────────────────
-const COMPANY = { name:'Concretera del Bajío', rfc:'CDB-120510-XXX', phone:'+52 477 123 4567', address:'Blvd. Aeropuerto 1200, León, Gto.', vehicles:12 };
-const EMPLOYEES = [
-  { id:'E01', name:'Ricardo Mendoza', role:'Conductor', vehicle:'TS-3456-A', group:'Tracto 1', totalMXN:8450, status:'pending', paid:0, receipts:4 },
-  { id:'E02', name:'María García', role:'Conductora', vehicle:'TS-7890-B', group:'Tracto 2', totalMXN:3200, status:'pending', paid:0, receipts:2 },
-  { id:'E03', name:'Juan Hernández', role:'Conductor', vehicle:'TS-1122-C', group:'Tracto 3', totalMXN:12800, status:'overdue', paid:5000, receipts:5 },
-  { id:'E04', name:'Ana Rodríguez', role:'Conductora', vehicle:'TC-3344-D', group:'Volteo 1', totalMXN:0, status:'verified', paid:0, receipts:0 },
-  { id:'E05', name:'Carlos López', role:'Conductor', vehicle:'TS-5566-E', group:'Tracto 1', totalMXN:6700, status:'review', paid:0, receipts:3 },
-  { id:'E06', name:'Sofía Martínez', role:'Conductora', vehicle:'TC-7788-F', group:'Volteo 2', totalMXN:2800, status:'paid', paid:2800, receipts:1 },
-  { id:'E07', name:'Pedro Sánchez', role:'Conductor', vehicle:'TS-9900-G', group:'Tracto 2', totalMXN:15000, status:'overdue', paid:8000, receipts:6 },
-  { id:'E08', name:'Luisa Fernández', role:'Conductora', vehicle:'TC-1112-H', group:'Volteo 1', totalMXN:0, status:'verified', paid:0, receipts:0 },
-  { id:'E09', name:'José Ramírez', role:'Conductor', vehicle:'TS-1314-I', group:'Tracto 3', totalMXN:9100, status:'pending', paid:2000, receipts:4 }
-];
-const RECEIPTS = [
-  { id:'R-001', driver:'Ricardo Mendoza', vehicle:'TS-3456-A', date:'2025-06-23', concept:'Diesel — 150 L', amount:3450, status:'review', match:95, phone:'+52 477 100 0001' },
-  { id:'R-002', driver:'Ricardo Mendoza', vehicle:'TS-3456-A', date:'2025-06-22', concept:'Diesel — 120 L', amount:2800, status:'review', match:88, phone:'+52 477 100 0001' },
-  { id:'R-003', driver:'Ricardo Mendoza', vehicle:'TS-3456-A', date:'2025-06-21', concept:'Diesel — 95 L', amount:2200, status:'review', match:72, phone:'+52 477 100 0001' },
-  { id:'R-004', driver:'María García', vehicle:'TS-7890-B', date:'2025-06-24', concept:'Diesel — 140 L', amount:3200, status:'review', match:91, phone:'+52 477 100 0002' },
-  { id:'R-005', driver:'María García', vehicle:'TS-7890-B', date:'2025-06-20', concept:'Diesel — 130 L', amount:2950, status:'paid', match:96, phone:'+52 477 100 0002' },
-  { id:'R-006', driver:'Juan Hernández', vehicle:'TS-1122-C', date:'2025-06-25', concept:'Diesel — 200 L', amount:4600, status:'review', match:93, phone:'+52 477 100 0003' },
-  { id:'R-007', driver:'Juan Hernández', vehicle:'TS-1122-C', date:'2025-06-24', concept:'Diesel — 180 L', amount:4100, status:'review', match:85, phone:'+52 477 100 0003' },
-  { id:'R-008', driver:'Juan Hernández', vehicle:'TS-1122-C', date:'2025-06-22', concept:'Diesel — 100 L', amount:2300, status:'paid', match:97, phone:'+52 477 100 0003' },
-  { id:'R-009', driver:'Juan Hernández', vehicle:'TS-1122-C', date:'2025-06-23', concept:'Diesel — 80 L', amount:1800, status:'overdue', match:60, phone:'+52 477 100 0003' },
-  { id:'R-010', driver:'Carlos López', vehicle:'TS-5566-E', date:'2025-06-26', concept:'Diesel — 160 L', amount:3700, status:'review', match:89, phone:'+52 477 100 0004' },
-  { id:'R-011', driver:'Carlos López', vehicle:'TS-5566-E', date:'2025-06-25', concept:'Diesel — 130 L', amount:3000, status:'review', match:76, phone:'+52 477 100 0004' },
-  { id:'R-012', driver:'Sofía Martínez', vehicle:'TC-7788-F', date:'2025-06-24', concept:'Diesel — 120 L', amount:2800, status:'paid', match:94, phone:'+52 477 100 0005' },
-  { id:'R-013', driver:'Pedro Sánchez', vehicle:'TS-9900-G', date:'2025-06-26', concept:'Diesel — 200 L', amount:4600, status:'review', match:90, phone:'+52 477 100 0006' },
-  { id:'R-014', driver:'Pedro Sánchez', vehicle:'TS-9900-G', date:'2025-06-25', concept:'Diesel — 180 L', amount:4100, status:'overdue', match:55, phone:'+52 477 100 0006' },
-  { id:'R-015', driver:'Pedro Sánchez', vehicle:'TS-9900-G', date:'2025-06-22', concept:'Diesel — 150 L', amount:3400, status:'paid', match:98, phone:'+52 477 100 0006' },
-  { id:'R-016', driver:'Pedro Sánchez', vehicle:'TS-9900-G', date:'2025-06-21', concept:'Diesel — 130 L', amount:2900, status:'paid', match:95, phone:'+52 477 100 0006' },
-  { id:'R-017', driver:'Ricardo Mendoza', vehicle:'TS-3456-A', date:'2025-06-20', concept:'Mantenimiento — Aceite', amount:950, status:'paid', match:99, phone:'+52 477 100 0001' },
-  { id:'R-018', driver:'José Ramírez', vehicle:'TS-1314-I', date:'2025-06-26', concept:'Diesel — 200 L', amount:4600, status:'review', match:87, phone:'+52 477 100 0007' },
-  { id:'R-019', driver:'José Ramírez', vehicle:'TS-1314-I', date:'2025-06-25', concept:'Diesel — 100 L', amount:2300, status:'review', match:82, phone:'+52 477 100 0007' },
-  { id:'R-020', driver:'José Ramírez', vehicle:'TS-1314-I', date:'2025-06-24', concept:'Diesel — 95 L', amount:2200, status:'paid', match:96, phone:'+52 477 100 0007' }
-];
-const PRICING_TIERS = [
-  { name:'Básico', price:999, period:'/mes', desc:'Hasta 3 conductores', features:['3 conductores','Recepcion de comprobantes','Dashboard básico','Soporte email'] },
-  { name:'Pro', price:2499, period:'/mes', desc:'Hasta 10 conductores', features:['10 conductores','Revisión con IA','Pagos automatizados','Soporte prioritario'], featured:true },
-  { name:'Premium', price:4999, period:'/mes', desc:'Hasta 25 conductores', features:['25 conductores','Conciliación automática','API access','Reportes avanzados','Soporte 24/7'] },
-  { name:'Empresarial', price:9999, period:'/mes', desc:'Conductores ilimitados', features:['Conductores ilimitados','Onboarding dedicado','SLA garantizado','API personalizada','Gerente de cuenta'] }
-];
-const TOTALS = { pending:8, overdue:2, review:10, paid:7, totalMXN:62100, paidMXN:25350 };
+const COMPANY = {"name": "Autotransportes del Norte S.A. de C.V.", "rfc": "ADN-220614-XYZ", "phone": "+52 871 234 5678", "address": "Blvd. Industrial 1500, Torreon, Coah.", "vehicles": 22, "short": "ADN"};
+const EMPLOYEES = [{"id": "E01", "name": "Ricardo Mendoza", "role": "Conductor", "vehicle": "TS-XF350", "group": "Tracto 1", "totalMXN": 0, "status": "pending", "paid": 0, "receipts": 1}, {"id": "E02", "name": "Maria Garcia", "role": "Operador", "vehicle": "TS-XF704", "group": "Tracto 2", "totalMXN": 2800, "status": "paid", "paid": 2432, "receipts": 0}, {"id": "E03", "name": "Juan Hernandez", "role": "Operadora", "vehicle": "TS-XF338", "group": "Tracto 3", "totalMXN": 2800, "status": "pending", "paid": 0, "receipts": 4}, {"id": "E04", "name": "Ana Rodriguez", "role": "Operadora", "vehicle": "TS-XF833", "group": "Volteo 1", "totalMXN": 15000, "status": "pending", "paid": 0, "receipts": 5}, {"id": "E05", "name": "Carlos Lopez", "role": "Conductora", "vehicle": "TS-XF703", "group": "Volteo 2", "totalMXN": 4500, "status": "overdue", "paid": 0, "receipts": 2}, {"id": "E06", "name": "Sofia Martinez", "role": "Conductora", "vehicle": "TS-XF448", "group": "Tracto 1", "totalMXN": 3200, "status": "pending", "paid": 0, "receipts": 2}, {"id": "E07", "name": "Pedro Sanchez", "role": "Conductor", "vehicle": "TS-XF204", "group": "Tracto 2", "totalMXN": 4500, "status": "paid", "paid": 2379, "receipts": 3}, {"id": "E08", "name": "Luisa Fernandez", "role": "Conductor", "vehicle": "TS-XF718", "group": "Tracto 3", "totalMXN": 8450, "status": "pending", "paid": 0, "receipts": 2}, {"id": "E09", "name": "Jose Ramirez", "role": "Operador", "vehicle": "TS-XF487", "group": "Volteo 1", "totalMXN": 12800, "status": "pending", "paid": 0, "receipts": 0}, {"id": "E10", "name": "Laura Torres", "role": "Conductor", "vehicle": "TS-XF691", "group": "Volteo 2", "totalMXN": 22400, "status": "review", "paid": 0, "receipts": 1}, {"id": "E11", "name": "Miguel Ruiz", "role": "Operadora", "vehicle": "TS-XF891", "group": "Tracto 1", "totalMXN": 0, "status": "pending", "paid": 0, "receipts": 2}, {"id": "E12", "name": "Carmen Vargas", "role": "Operador", "vehicle": "TS-XF489", "group": "Tracto 2", "totalMXN": 4500, "status": "pending", "paid": 0, "receipts": 2}, {"id": "E13", "name": "Daniel Castillo", "role": "Conductor", "vehicle": "TS-XF266", "group": "Tracto 3", "totalMXN": 0, "status": "verified", "paid": 0, "receipts": 0}, {"id": "E14", "name": "Patricia Rios", "role": "Conductor", "vehicle": "TS-XF818", "group": "Volteo 1", "totalMXN": 22400, "status": "review", "paid": 0, "receipts": 5}, {"id": "E15", "name": "Roberto Cruz", "role": "Operadora", "vehicle": "TS-XF646", "group": "Volteo 2", "totalMXN": 18600, "status": "pending", "paid": 0, "receipts": 5}, {"id": "E16", "name": "Elena Morales", "role": "Conductora", "vehicle": "TS-XF488", "group": "Tracto 1", "totalMXN": 3200, "status": "review", "paid": 0, "receipts": 2}, {"id": "E17", "name": "Alejandro Paredes", "role": "Conductor", "vehicle": "TS-XF963", "group": "Tracto 2", "totalMXN": 22400, "status": "review", "paid": 0, "receipts": 6}, {"id": "E18", "name": "Veronica Salazar", "role": "Operador", "vehicle": "TS-XF924", "group": "Tracto 3", "totalMXN": 4500, "status": "pending", "paid": 0, "receipts": 2}, {"id": "E19", "name": "Francisco Delgado", "role": "Operador", "vehicle": "TS-XF316", "group": "Volteo 1", "totalMXN": 6700, "status": "overdue", "paid": 0, "receipts": 4}, {"id": "E20", "name": "Gabriela Nava", "role": "Conductora", "vehicle": "TS-XF505", "group": "Volteo 2", "totalMXN": 4500, "status": "review", "paid": 0, "receipts": 5}];
+const RECEIPTS = [{"id": "R-001", "driver": "Roberto Cruz", "vehicle": "TS-XF646", "date": "2025-06-18", "concept": "Diesel 130 L", "amount": 3000, "status": "review", "match": 89, "phone": "+52 477 369 8019"}, {"id": "R-002", "driver": "Francisco Delgado", "vehicle": "TS-XF316", "date": "2025-06-05", "concept": "Mantenimiento Aceite", "amount": 2500, "status": "review", "match": 87, "phone": "+52 477 605 2489"}, {"id": "R-003", "driver": "Maria Garcia", "vehicle": "TS-XF704", "date": "2025-06-22", "concept": "Diesel 120 L", "amount": 2750, "status": "review", "match": 82, "phone": "+52 477 710 2040"}, {"id": "R-004", "driver": "Daniel Castillo", "vehicle": "TS-XF266", "date": "2025-06-18", "concept": "Mantenimiento Aceite", "amount": 4500, "status": "paid", "match": 55, "phone": "+52 477 796 2876"}, {"id": "R-005", "driver": "Veronica Salazar", "vehicle": "TS-XF924", "date": "2025-06-10", "concept": "Diesel 180 L", "amount": 4350, "status": "review", "match": 82, "phone": "+52 477 261 8433"}, {"id": "R-006", "driver": "Ricardo Mendoza", "vehicle": "TS-XF350", "date": "2025-06-17", "concept": "Diesel 180 L", "amount": 4450, "status": "overdue", "match": 61, "phone": "+52 477 991 5889"}, {"id": "R-007", "driver": "Alejandro Paredes", "vehicle": "TS-XF963", "date": "2025-06-25", "concept": "Peaje Caseta L-04", "amount": 550, "status": "review", "match": 65, "phone": "+52 477 652 9689"}, {"id": "R-008", "driver": "Ricardo Mendoza", "vehicle": "TS-XF350", "date": "2025-06-04", "concept": "Peaje Caseta L-04", "amount": 950, "status": "review", "match": 78, "phone": "+52 477 999 6038"}, {"id": "R-009", "driver": "Luisa Fernandez", "vehicle": "TS-XF718", "date": "2025-06-03", "concept": "Diesel 95 L", "amount": 2200, "status": "paid", "match": 60, "phone": "+52 477 849 8962"}, {"id": "R-010", "driver": "Juan Hernandez", "vehicle": "TS-XF338", "date": "2025-06-16", "concept": "Peaje Caseta L-02", "amount": 380, "status": "review", "match": 90, "phone": "+52 477 269 5342"}, {"id": "R-011", "driver": "Alejandro Paredes", "vehicle": "TS-XF963", "date": "2025-06-30", "concept": "Peaje Caseta L-04", "amount": 1200, "status": "pending", "match": 89, "phone": "+52 477 873 4295"}, {"id": "R-012", "driver": "Laura Torres", "vehicle": "TS-XF691", "date": "2025-06-17", "concept": "Mantenimiento Aceite", "amount": 2500, "status": "review", "match": 83, "phone": "+52 477 223 5061"}, {"id": "R-013", "driver": "Luisa Fernandez", "vehicle": "TS-XF718", "date": "2025-06-08", "concept": "Diesel 100 L", "amount": 2350, "status": "paid", "match": 92, "phone": "+52 477 325 1117"}, {"id": "R-014", "driver": "Juan Hernandez", "vehicle": "TS-XF338", "date": "2025-06-29", "concept": "Lavado completo", "amount": 250, "status": "review", "match": 57, "phone": "+52 477 980 6413"}, {"id": "R-015", "driver": "Juan Hernandez", "vehicle": "TS-XF338", "date": "2025-06-16", "concept": "Peaje Caseta L-01", "amount": 550, "status": "review", "match": 68, "phone": "+52 477 652 3167"}, {"id": "R-016", "driver": "Francisco Delgado", "vehicle": "TS-XF316", "date": "2025-06-16", "concept": "Peaje Caseta L-03", "amount": 1800, "status": "review", "match": 81, "phone": "+52 477 294 2545"}, {"id": "R-017", "driver": "Ana Rodriguez", "vehicle": "TS-XF833", "date": "2025-06-14", "concept": "Chequeo mecanico", "amount": 800, "status": "review", "match": 84, "phone": "+52 477 984 1887"}, {"id": "R-018", "driver": "Ana Rodriguez", "vehicle": "TS-XF833", "date": "2025-06-28", "concept": "Diesel 95 L", "amount": 2250, "status": "review", "match": 61, "phone": "+52 477 354 4139"}, {"id": "R-019", "driver": "Pedro Sanchez", "vehicle": "TS-XF204", "date": "2025-06-06", "concept": "Peaje Caseta L-02", "amount": 1800, "status": "review", "match": 72, "phone": "+52 477 573 5092"}, {"id": "R-020", "driver": "Juan Hernandez", "vehicle": "TS-XF338", "date": "2025-06-18", "concept": "Mantenimiento Frenos", "amount": 650, "status": "review", "match": 55, "phone": "+52 477 195 4872"}, {"id": "R-021", "driver": "Sofia Martinez", "vehicle": "TS-XF448", "date": "2025-06-28", "concept": "Mantenimiento Llantas", "amount": 4500, "status": "review", "match": 80, "phone": "+52 477 160 3697"}, {"id": "R-022", "driver": "Daniel Castillo", "vehicle": "TS-XF266", "date": "2025-06-26", "concept": "Diesel 80 L", "amount": 2000, "status": "review", "match": 84, "phone": "+52 477 392 7930"}, {"id": "R-023", "driver": "Veronica Salazar", "vehicle": "TS-XF924", "date": "2025-06-10", "concept": "Chequeo mecanico", "amount": 800, "status": "review", "match": 68, "phone": "+52 477 159 9883"}, {"id": "R-024", "driver": "Maria Garcia", "vehicle": "TS-XF704", "date": "2025-06-17", "concept": "Diesel 220 L", "amount": 5000, "status": "paid", "match": 88, "phone": "+52 477 261 1931"}, {"id": "R-025", "driver": "Alejandro Paredes", "vehicle": "TS-XF963", "date": "2025-06-03", "concept": "Diesel 100 L", "amount": 2450, "status": "review", "match": 98, "phone": "+52 477 982 4853"}, {"id": "R-026", "driver": "Daniel Castillo", "vehicle": "TS-XF266", "date": "2025-06-19", "concept": "Diesel 120 L", "amount": 2950, "status": "paid", "match": 93, "phone": "+52 477 140 2343"}, {"id": "R-027", "driver": "Patricia Rios", "vehicle": "TS-XF818", "date": "2025-06-07", "concept": "Chequeo mecanico", "amount": 500, "status": "pending", "match": 97, "phone": "+52 477 833 6147"}, {"id": "R-028", "driver": "Luisa Fernandez", "vehicle": "TS-XF718", "date": "2025-06-10", "concept": "Diesel 180 L", "amount": 4200, "status": "paid", "match": 84, "phone": "+52 477 423 2188"}, {"id": "R-029", "driver": "Ricardo Mendoza", "vehicle": "TS-XF350", "date": "2025-06-07", "concept": "Mantenimiento Frenos", "amount": 650, "status": "review", "match": 87, "phone": "+52 477 371 3170"}, {"id": "R-030", "driver": "Carmen Vargas", "vehicle": "TS-XF489", "date": "2025-06-06", "concept": "Diesel 100 L", "amount": 2450, "status": "review", "match": 83, "phone": "+52 477 953 9900"}, {"id": "R-031", "driver": "Laura Torres", "vehicle": "TS-XF691", "date": "2025-06-18", "concept": "Peaje Caseta L-04", "amount": 150, "status": "paid", "match": 74, "phone": "+52 477 779 2697"}, {"id": "R-032", "driver": "Carlos Lopez", "vehicle": "TS-XF703", "date": "2025-06-18", "concept": "Diesel 180 L", "amount": 4100, "status": "review", "match": 64, "phone": "+52 477 378 5616"}, {"id": "R-033", "driver": "Gabriela Nava", "vehicle": "TS-XF505", "date": "2025-06-21", "concept": "Diesel 150 L", "amount": 3600, "status": "review", "match": 71, "phone": "+52 477 617 9004"}, {"id": "R-034", "driver": "Jose Ramirez", "vehicle": "TS-XF487", "date": "2025-06-09", "concept": "Diesel 95 L", "amount": 2150, "status": "review", "match": 57, "phone": "+52 477 103 6464"}, {"id": "R-035", "driver": "Carlos Lopez", "vehicle": "TS-XF703", "date": "2025-06-15", "concept": "Lavado completo", "amount": 500, "status": "review", "match": 90, "phone": "+52 477 822 8007"}, {"id": "R-036", "driver": "Veronica Salazar", "vehicle": "TS-XF924", "date": "2025-06-23", "concept": "Diesel 80 L", "amount": 1800, "status": "pending", "match": 64, "phone": "+52 477 658 1590"}, {"id": "R-037", "driver": "Carmen Vargas", "vehicle": "TS-XF489", "date": "2025-06-02", "concept": "Peaje Caseta L-03", "amount": 380, "status": "review", "match": 74, "phone": "+52 477 473 1653"}, {"id": "R-038", "driver": "Carmen Vargas", "vehicle": "TS-XF489", "date": "2025-06-12", "concept": "Diesel 150 L", "amount": 3600, "status": "paid", "match": 90, "phone": "+52 477 995 7658"}, {"id": "R-039", "driver": "Gabriela Nava", "vehicle": "TS-XF505", "date": "2025-06-06", "concept": "Diesel 130 L", "amount": 3200, "status": "review", "match": 66, "phone": "+52 477 522 1406"}, {"id": "R-040", "driver": "Sofia Martinez", "vehicle": "TS-XF448", "date": "2025-06-22", "concept": "Diesel 220 L", "amount": 5350, "status": "review", "match": 70, "phone": "+52 477 373 3608"}];
+const PRICING_TIERS = [{"name": "Basico", "price": 999, "period": "/mes", "desc": "Hasta 3 conductores", "features": ["3 conductores", "Recepcion de comprobantes", "Dashboard basico", "Soporte email"]}, {"name": "Pro", "price": 2499, "period": "/mes", "desc": "Hasta 10 conductores", "features": ["10 conductores", "Revision con IA", "Pagos automatizados", "Soporte prioritario"], "featured": true}, {"name": "Premium", "price": 4999, "period": "/mes", "desc": "Hasta 25 conductores", "features": ["25 conductores", "Conciliacion automatica", "API access", "Reportes avanzados", "Soporte 24/7"]}, {"name": "Empresarial", "price": 9999, "period": "/mes", "desc": "Conductores ilimitados", "features": ["Conductores ilimitados", "Onboarding dedicado", "SLA garantizado", "API personalizada", "Gerente de cuenta"]}];
+const TOTALS = {"pending": 3, "overdue": 1, "review": 28, "paid": 8, "totalMXN": 90110, "paidMXN": 24950};
 
-// ─── PAGES ─────────────────────────────────────────────────────────
 const PAGES = {
-  dashboard: {
-    title:'Dashboard',
-    render:()=>{
-      const c=TOTALS;
-      return `<div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-icon teal"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-label">Por Pagar (Pendiente)</div><div class="kpi-value">$${(c.totalMXN-c.paidMXN).toLocaleString()}</div><div class="kpi-sub">${c.pending} pendientes · ${c.review} en revisión</div></div>
-        <div class="kpi-card"><div class="kpi-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="kpi-label">Pagado Este Mes</div><div class="kpi-value">$${c.paidMXN.toLocaleString()}</div><div class="kpi-sub">${c.paid} comprobantes pagados</div></div>
-        <div class="kpi-card"><div class="kpi-icon amber"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="kpi-label">En Revisión</div><div class="kpi-value">${c.review}</div><div class="kpi-sub">comprobantes requieren verificación</div></div>
-        <div class="kpi-card"><div class="kpi-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="kpi-label">Vencidos</div><div class="kpi-value">${c.overdue}</div><div class="kpi-sub">requieren atención inmediata</div></div>
-      </div>
-      <div class="card"><div class="card-header"><h2>📋 Resumen de Conductores</h2></div><div class="card-body"><table>
-        <thead><tr><th>Conductor</th><th>Vehículo</th><th>Grupo</th><th>Total (MXN)</th><th>Pagado</th><th>Estado</th><th>Acción</th></tr></thead>
-        <tbody>${EMPLOYEES.filter(e=>e.totalMXN>0||e.status!=='verified').map(e=>{
-          const statusMap={pending:'Pendiente',paid:'Pagado',overdue:'Vencido',review:'Revisión',verified:'Verificado'};
-          const dotMap={pending:'amber',paid:'green',overdue:'red',review:'amber',verified:'green'};
-          return `<tr><td class="font-medium">${e.name}</td><td>${e.vehicle}</td><td>${e.group}</td><td class="font-semibold">$${e.totalMXN.toLocaleString()}</td><td>$${e.paid.toLocaleString()}</td><td><span class="status-dot ${dotMap[e.status]}"></span>${statusMap[e.status]}</td><td><button class="btn btn-sm ${e.totalMXN>e.paid?'btn-primary':'btn-outline'}" onclick="navigate('a-pagar')">${e.totalMXN>e.paid?'Pagar':'Ver'}</button></td></tr>`;
-        }).join('')}</tbody></table></div></div>
-        <div class="card"><div class="card-header"><h2>🛞 Flota</h2></div><div class="card-body" style="padding:20px"><p style="color:var(--g-500)"><strong>${COMPANY.vehicles}</strong> vehículos registrados · <strong>${EMPLOYEES.length}</strong> conductores</p></div></div>`;
-    }
-  },
-  'a-pagar':{
-    title:'A Pagar',
-    render:()=>{
-      const pending=EMPLOYEES.filter(e=>e.totalMXN>e.paid);
-      return `<div class="card"><div class="card-header"><h2>💰 Pagos Pendientes</h2><span class="text-sm">${pending.length} conductores</span></div><div class="card-body"><table>
-        <thead><tr><th>Conductor</th><th>Vehículo</th><th>Grupo</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Comprobantes</th><th>Estado</th><th>Acción</th></tr></thead>
-        <tbody>${pending.map(e=>{
-          const statusMap={pending:'Pendiente',overdue:'Vencido',review:'Revisión',paid:'Pagado',verified:'Verificado'};
-          const dotMap={pending:'amber',overdue:'red',review:'amber',paid:'green',verified:'green'};
-          const badgeMap={pending:'badge-pending',overdue:'badge-overdue',review:'badge-review',paid:'badge-paid',verified:'badge-verified'};
-          return `<tr><td class="font-medium">${e.name}</td><td>${e.vehicle}</td><td>${e.group}</td><td class="font-semibold">$${e.totalMXN.toLocaleString()}</td><td>$${e.paid.toLocaleString()}</td><td class="font-semibold" style="color:${e.totalMXN-e.paid>5000?'var(--red)':'var(--b)'}">$${(e.totalMXN-e.paid).toLocaleString()}</td><td>${e.receipts}</td><td><span class="badge ${badgeMap[e.status]}"><span class="status-dot ${dotMap[e.status]}"></span>${statusMap[e.status]}</span></td><td><button class="btn btn-sm btn-primary" onclick="simulatePayment('${e.id}','${e.name}','${e.totalMXN-e.paid}')">Pagar</button></td></tr>`;
-        }).join('')}</tbody></table></div></div>`;
-    }
-  },
-  comprobantes:{
-    title:'Comprobantes',
-    render:()=>{
-      return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-        <div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Buscar comprobante..." id="receipt-search" oninput="filterReceipts()"></div>
-        <div style="display:flex;gap:8px">
-          <select id="receipt-filter" onchange="filterReceipts()" style="padding:8px 12px;border:1px solid var(--g-300);border-radius:var(--radius-sm);font-size:14px;background:var(--w)">
-            <option value="all">Todos</option>
-            <option value="review">Revisión</option>
-            <option value="paid">Pagado</option>
-            <option value="overdue">Vencido</option>
-          </select>
-        </div>
-      </div>
-      <div class="card"><div class="card-body"><table>
-        <thead><tr><th>ID</th><th>Conductor</th><th>Vehículo</th><th>Fecha</th><th>Concepto</th><th>Monto</th><th>IA Match</th><th>Estado</th><th>Acción</th></tr></thead>
-        <tbody id="receipt-tbody">${RECEIPTS.map(r=>{
-          const badgeMap={review:'badge-review',paid:'badge-paid',overdue:'badge-overdue'};
-          const statusMap={review:'Revisión',paid:'Pagado',overdue:'Vencido'};
-          const confClass=r.match>=90?'conf-high':r.match>=75?'conf-med':'conf-low';
-          const confLabel=r.match>=90?'Alta':r.match>=75?'Media':'Baja';
-          return `<tr data-status="${r.status}" data-search="${r.id} ${r.driver} ${r.concept}">
-            <td class="text-sm" style="font-family:monospace">${r.id}</td>
-            <td class="font-medium">${r.driver}</td>
-            <td>${r.vehicle}</td>
-            <td>${r.date}</td>
-            <td>${r.concept}</td>
-            <td class="font-semibold">$${r.amount.toLocaleString()}</td>
-            <td><span class="conf-badge ${confClass}">${r.match}% · ${confLabel}</span></td>
-            <td><span class="badge ${badgeMap[r.status]}">${statusMap[r.status]}</span></td>
-            <td><button class="btn btn-sm btn-outline" onclick="openReceipt('${r.id}')">Revisar</button></td>
-          </tr>`;
-        }).join('')}</tbody></table></div></div>`;
-    }
-  },
-  conductores:{
-    title:'Conductores',
-    render:()=>{
-      return `<div class="card">
-        <div class="card-header"><h2>👥 Conductores Registrados</h2><span class="text-sm">${EMPLOYEES.length} total</span></div>
-        <div class="card-body"><table>
-          <thead><tr><th>ID</th><th>Nombre</th><th>Rol</th><th>Vehículo</th><th>Grupo</th><th>Comprobantes</th><th>Total Mes</th><th>Estado</th></tr></thead>
-          <tbody>${EMPLOYEES.map(e=>{
-            const statusMap={pending:'Pendiente',paid:'Pagado',overdue:'Vencido',review:'Revisión',verified:'Verificado'};
-            const dotMap={pending:'amber',paid:'green',overdue:'red',review:'amber',verified:'green'};
-            return `<tr><td style="font-family:monospace;font-size:13px">${e.id}</td><td class="font-medium">${e.name}</td><td>${e.role}</td><td>${e.vehicle}</td><td>${e.group}</td><td>${e.receipts}</td><td class="font-semibold">$${e.totalMXN.toLocaleString()}</td><td><span class="status-dot ${dotMap[e.status]}"></span>${statusMap[e.status]}</td></tr>`;
-          }).join('')}</tbody></table></div></div>`;
-    }
-  },
-  configuracion:{
-    title:'Configuración',
-    render:()=>{
-      return `<div class="card"><div class="card-header"><h2>🏢 Empresa</h2></div><div class="card-body" style="padding:20px">
-        <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value">${COMPANY.name}</span></div>
-        <div class="detail-row"><span class="detail-label">RFC</span><span class="detail-value">${COMPANY.rfc}</span></div>
-        <div class="detail-row"><span class="detail-label">Teléfono</span><span class="detail-value">${COMPANY.phone}</span></div>
-        <div class="detail-row"><span class="detail-label">Dirección</span><span class="detail-value">${COMPANY.address}</span></div>
-        <div class="detail-row"><span class="detail-label">Vehículos</span><span class="detail-value">${COMPANY.vehicles}</span></div>
-      </div></div>
-      <div class="card"><div class="card-header"><h2>💳 Planes y Precios</h2></div><div class="card-body" style="padding:20px">
-        <div class="pricing-grid">${PRICING_TIERS.map(p=>`
-          <div class="pricing-card${p.featured?' featured':''}">
-            <div class="plan-name">${p.name}</div>
-            <div class="plan-price">$${p.price}<small>${p.period}</small></div>
-            <div class="plan-desc">${p.desc}</div>
-            <ul class="plan-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
-            ${p.featured?'<button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center">Plan Actual</button>':''}
-          </div>`).join('')}</div></div>`;
-    }
-  }
+dashboard:{
+title:'Dashboard',
+render:()=>{
+const c=TOTALS;
+const ae=EMPLOYEES.filter(e=>e.totalMXN>0||e.status!=='verified');
+return '<div class="kpi-grid">'+
+'<div class="kpi-card"><div class="kpi-icon teal"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-label">Por Pagar (Pendiente)</div><div class="kpi-value">$'+(c.totalMXN-c.paidMXN).toLocaleString()+'</div><div class="kpi-sub">'+c.pending+' pendientes · '+c.review+' en revision</div></div>'+
+'<div class="kpi-card"><div class="kpi-icon green"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="kpi-label">Pagado Este Mes</div><div class="kpi-value">$'+c.paidMXN.toLocaleString()+'</div><div class="kpi-sub">'+c.paid+' comprobantes pagados</div></div>'+
+'<div class="kpi-card"><div class="kpi-icon amber"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="kpi-label">En Revision</div><div class="kpi-value">'+c.review+'</div><div class="kpi-sub">comprobantes requieren verificacion</div></div>'+
+'<div class="kpi-card"><div class="kpi-icon red"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="kpi-label">Vencidos</div><div class="kpi-value">'+c.overdue+'</div><div class="kpi-sub">requieren atencion inmediata</div></div>'+
+'</div>'+
+'<div class="card"><div class="card-header"><h2>Resumen de Conductores</h2></div><div class="card-body"><table>'+
+'<thead><tr><th>Conductor</th><th>Vehiculo</th><th>Grupo</th><th>Total (MXN)</th><th>Pagado</th><th>Estado</th><th>Accion</th></tr></thead>'+
+'<tbody>'+ae.map(e=>{const st={'pending':'Pendiente','paid':'Pagado','overdue':'Vencido','review':'Revision','verified':'Verificado'};const dt={'pending':'amber','paid':'green','overdue':'red','review':'amber','verified':'green'};return '<tr><td class="font-medium">'+e.name+'</td><td>'+e.vehicle+'</td><td>'+e.group+'</td><td class="font-semibold">$'+e.totalMXN.toLocaleString()+'</td><td>$'+e.paid.toLocaleString()+'</td><td><span class="status-dot '+dt[e.status]+'"></span>'+st[e.status]+'</td><td><button class="btn btn-sm '+(e.totalMXN>e.paid?'btn-primary':'btn-outline')+'" onclick="navigate(\'a-pagar\')">'+(e.totalMXN>e.paid?'Pagar':'Ver')+'</button></td></tr>'}).join('')+'</tbody></table></div></div>'+
+'<div class="card"><div class="card-header"><h2>Flota</h2></div><div class="card-body" style="padding:20px"><p style="color:var(--g-500)"><strong>'+COMPANY.vehicles+'</strong> vehiculos registrados · <strong>'+EMPLOYEES.length+'</strong> conductores</p></div></div>'
+}
+},
+'a-pagar':{
+title:'A Pagar',
+render:()=>{
+const pe=EMPLOYEES.filter(e=>e.totalMXN>e.paid);
+return '<div class="card"><div class="card-header"><h2>Pagos Pendientes</h2><span class="text-sm">'+pe.length+' conductores</span></div><div class="card-body"><table>'+
+'<thead><tr><th>Conductor</th><th>Vehiculo</th><th>Grupo</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Comprobantes</th><th>Estado</th><th>Accion</th></tr></thead>'+
+'<tbody>'+pe.map(e=>{const st={'pending':'Pendiente','overdue':'Vencido','review':'Revision','paid':'Pagado','verified':'Verificado'};const dt={'pending':'amber','overdue':'red','review':'amber','paid':'green','verified':'green'};const bg={'pending':'badge-pending','overdue':'badge-overdue','review':'badge-review','paid':'badge-paid','verified':'badge-verified'};return '<tr><td class="font-medium">'+e.name+'</td><td>'+e.vehicle+'</td><td>'+e.group+'</td><td class="font-semibold">$'+e.totalMXN.toLocaleString()+'</td><td>$'+e.paid.toLocaleString()+'</td><td class="font-semibold" style="color:'+(e.totalMXN-e.paid>5000?'var(--red)':'var(--text)')+'">$'+(e.totalMXN-e.paid).toLocaleString()+'</td><td>'+e.receipts+'</td><td><span class="badge '+bg[e.status]+'"><span class="status-dot '+dt[e.status]+'"></span>'+st[e.status]+'</span></td><td><button class="btn btn-sm btn-primary" onclick="simulatePayment(\''+e.id+'\',\''+e.name+'\',\''+(e.totalMXN-e.paid)+'\')">Pagar</button></td></tr>'}).join('')+'</tbody></table></div></div>'
+}
+},
+comprobantes:{
+title:'Comprobantes',
+render:()=>{
+return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">'+
+'<div class="search-bar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Buscar comprobante..." id="receipt-search" oninput="filterReceipts()"></div>'+
+'<div style="display:flex;gap:8px"><select id="receipt-filter" onchange="filterReceipts()">'+
+'<option value="all">Todos</option><option value="review">Revision</option><option value="paid">Pagado</option><option value="overdue">Vencido</option><option value="pending">Pendiente</option>'+
+'</select></div></div>'+
+'<div class="card"><div class="card-body"><table>'+
+'<thead><tr><th>ID</th><th>Conductor</th><th>Vehiculo</th><th>Fecha</th><th>Concepto</th><th>Monto</th><th>IA Match</th><th>Estado</th><th>Accion</th></tr></thead>'+
+'<tbody id="receipt-tbody">'+RECEIPTS.map(r=>{const bg={'review':'badge-review','paid':'badge-paid','overdue':'badge-overdue','pending':'badge-pending'};const st={'review':'Revision','paid':'Pagado','overdue':'Vencido','pending':'Pendiente'};const cc=r.match>=90?'conf-high':r.match>=75?'conf-med':'conf-low';const cl=r.match>=90?'Alta':r.match>=75?'Media':'Baja';return '<tr data-status="'+r.status+'" data-search="'+r.id+' '+r.driver+' '+r.concept+'"><td class="text-xs" style="font-family:monospace">'+r.id+'</td><td class="font-medium">'+r.driver+'</td><td>'+r.vehicle+'</td><td>'+r.date+'</td><td>'+r.concept+'</td><td class="font-semibold">$'+r.amount.toLocaleString()+'</td><td><span class="conf-badge '+cc+'">'+r.match+'% · '+cl+'</span></td><td><span class="badge '+bg[r.status]+'">'+st[r.status]+'</span></td><td><button class="btn btn-sm btn-outline" onclick="openReceipt(\''+r.id+'\')">Revisar</button></td></tr>'}).join('')+'</tbody></table></div></div>'
+}
+},
+conductores:{
+title:'Conductores',
+render:()=>{
+return '<div class="card"><div class="card-header"><h2>Conductores Registrados</h2><span class="text-sm">'+EMPLOYEES.length+' total</span></div><div class="card-body"><table>'+
+'<thead><tr><th>ID</th><th>Nombre</th><th>Rol</th><th>Vehiculo</th><th>Grupo</th><th>Comprobantes</th><th>Total Mes</th><th>Estado</th></tr></thead>'+
+'<tbody>'+EMPLOYEES.map(e=>{const st={'pending':'Pendiente','paid':'Pagado','overdue':'Vencido','review':'Revision','verified':'Verificado'};const dt={'pending':'amber','paid':'green','overdue':'red','review':'amber','verified':'green'};return '<tr><td style="font-family:monospace;font-size:12px">'+e.id+'</td><td class="font-medium">'+e.name+'</td><td>'+e.role+'</td><td>'+e.vehicle+'</td><td>'+e.group+'</td><td>'+e.receipts+'</td><td class="font-semibold">$'+e.totalMXN.toLocaleString()+'</td><td><span class="status-dot '+dt[e.status]+'"></span>'+st[e.status]+'</td></tr>'}).join('')+'</tbody></table></div></div>'
+}
+},
+configuracion:{
+title:'Configuracion',
+render:()=>{
+return '<div class="card"><div class="card-header"><h2>Empresa</h2></div><div class="card-body" style="padding:20px">'+
+'<div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value">'+COMPANY.name+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">RFC</span><span class="detail-value">'+COMPANY.rfc+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Telefono</span><span class="detail-value">'+COMPANY.phone+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Direccion</span><span class="detail-value">'+COMPANY.address+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Vehiculos</span><span class="detail-value">'+COMPANY.vehicles+'</span></div>'+
+'</div></div>'+
+'<div class="card"><div class="card-header"><h2>Planes y Precios</h2></div><div class="card-body" style="padding:20px">'+
+'<div class="pricing-grid">'+PRICING_TIERS.map(p=>'<div class="pricing-card'+(p.featured?' featured':'')+'"><div class="plan-name">'+p.name+'</div><div class="plan-price">$'+p.price+'<small>'+p.period+'</small></div><div class="plan-desc">'+p.desc+'</div><ul class="plan-features">'+p.features.map(f=>'<li>'+f+'</li>').join('')+'</ul>'+(p.featured?'<button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center">Plan Actual</button>':'')+'</div>').join('')+'</div></div>'
+}
+}
 };
 
-// ─── NAV ───────────────────────────────────────────────────────────
 function navigate(page){
-  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
-  document.querySelector(`.sidebar-nav a[data-page="${page}"]`)?.classList.add('active');
-  document.getElementById('page-title').textContent=PAGES[page].title;
-  document.getElementById('page-content').innerHTML=PAGES[page].render();
-  if(window.innerWidth<=768) document.getElementById('sidebar').classList.remove('mobile-open');
+document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+const nl=document.querySelector('.sidebar-nav a[data-page="'+page+'"]');
+if(nl)nl.classList.add('active');
+const pg=PAGES[page];
+if(pg){document.getElementById('page-title').textContent=pg.title;document.getElementById('page-content').innerHTML=pg.render()}
+if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('mobile-open');
 }
-document.querySelectorAll('.sidebar-nav a').forEach(a=>{
-  a.addEventListener('click',()=>navigate(a.dataset.page));
-});
 
-// ─── RECEIPT MODAL ────────────────────────────────────────────────
+document.addEventListener('click',function(e){const nl=e.target.closest('.sidebar-nav a[data-page]');if(nl)navigate(nl.dataset.page)});
+
 function openReceipt(id){
-  const r=RECEIPTS.find(x=>x.id===id);
-  if(!r) return;
-  const d=EMPLOYEES.find(e=>e.name===r.driver);
-  const confClass=r.match>=90?'conf-high':r.match>=75?'conf-med':'conf-low';
-  const confLabel=r.match>=90?'Alta':r.match>=75?'Media':'Baja';
-  const badgeMap={review:'badge-review',paid:'badge-paid',overdue:'badge-overdue'};
-  const statusMap={review:'Revisión',paid:'Pagado',overdue:'Vencido'};
-  const modal=document.getElementById('receipt-modal');
-  modal.querySelector('.modal-header h2').textContent=`Comprobante ${r.id}`;
-  modal.querySelector('.modal-body').innerHTML=`
-    <div class="section-title">📄 Datos del Comprobante</div>
-    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:monospace">${r.id}</span></div>
-    <div class="detail-row"><span class="detail-label">Conductor</span><span class="detail-value">${r.driver}</span></div>
-    <div class="detail-row"><span class="detail-label">Vehículo</span><span class="detail-value">${r.vehicle}</span></div>
-    <div class="detail-row"><span class="detail-label">Fecha</span><span class="detail-value">${r.date}</span></div>
-    <div class="detail-row"><span class="detail-label">Concepto</span><span class="detail-value">${r.concept}</span></div>
-    <div class="detail-row"><span class="detail-label">Monto</span><span class="detail-value" style="font-size:18px;font-weight:700">$${r.amount.toLocaleString()}</span></div>
-    <div class="detail-row"><span class="detail-label">Teléfono</span><span class="detail-value">${r.phone}</span></div>
-    <div class="detail-row"><span class="detail-label">Estado</span><span class="detail-value"><span class="badge ${badgeMap[r.status]}">${statusMap[r.status]}</span></span></div>
-    <div class="section-title">🤖 Verificación por IA</div>
-    <div class="detail-row"><span class="detail-label">Confianza General</span><span class="detail-value"><span class="conf-badge ${confClass}">${r.match}% · ${confLabel}</span></span></div>
-    <div class="detail-row"><span class="detail-label">Monto vs. Gasolina</span><span class="detail-value"><span class="conf-badge conf-high">95% · Alta</span></span></div>
-    <div class="detail-row"><span class="detail-label">Proveedor</span><span class="detail-value"><span class="conf-badge conf-med">82% · Media</span></span></div>
-    <div class="detail-row"><span class="detail-label">Fecha/Hora</span><span class="detail-value"><span class="conf-badge conf-high">98% · Alta</span></span></div>
-    <div class="detail-row"><span class="detail-label">Placas</span><span class="detail-value"><span class="conf-badge conf-med">78% · Media</span></span></div>
-    <div style="margin-top:16px;padding:12px;background:var(--p-light);border-radius:8px;font-size:13px;color:var(--g-600)">
-      <strong>📸</strong> Comprobante recibido vía WhatsApp el ${r.date} a las 14:32 hrs.
-      ${r.match<75?'<br><span style="color:var(--red)">⚠️ Baja confianza — revisión manual requerida</span>':''}
-    </div>`;
-  modal.classList.add('open');
-  modal.querySelector('.modal-footer').innerHTML=`
-    ${r.status==='review'?`<button class="btn btn-success" onclick="markPaid('${r.id}')">✅ Aprobar y Pagar</button>`:''}
-    ${r.status==='overdue'?`<button class="btn btn-danger" onclick="markPaid('${r.id}')">⚠️ Pagar Vencido</button>`:''}
-    <button class="btn btn-outline" onclick="closeReceiptModal()">Cerrar</button>`;
+const r=RECEIPTS.find(x=>x.id===id);if(!r)return;
+const bg={'review':'badge-review','paid':'badge-paid','overdue':'badge-overdue','pending':'badge-pending'};
+const st={'review':'Revision','paid':'Pagado','overdue':'Vencido','pending':'Pendiente'};
+const cc=r.match>=90?'conf-high':r.match>=75?'conf-med':'conf-low';const cl=r.match>=90?'Alta':r.match>=75?'Media':'Baja';
+const m=document.getElementById('receipt-modal');
+m.querySelector('.modal-header h2').textContent='Comprobante '+r.id;
+m.querySelector('.modal-body').innerHTML='<div class="section-title">Datos del Comprobante</div>'+
+'<div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:monospace">'+r.id+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Conductor</span><span class="detail-value">'+r.driver+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Vehiculo</span><span class="detail-value">'+r.vehicle+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Fecha</span><span class="detail-value">'+r.date+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Concepto</span><span class="detail-value">'+r.concept+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Monto</span><span class="detail-value" style="font-size:18px;font-weight:700">$'+r.amount.toLocaleString()+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Telefono</span><span class="detail-value">'+r.phone+'</span></div>'+
+'<div class="detail-row"><span class="detail-label">Estado</span><span class="detail-value"><span class="badge '+bg[r.status]+'">'+st[r.status]+'</span></span></div>'+
+'<div class="section-title">Verificacion por IA</div>'+
+'<div class="detail-row"><span class="detail-label">Confianza General</span><span class="detail-value"><span class="conf-badge '+cc+'">'+r.match+'% · '+cl+'</span></span></div>'+
+'<div class="detail-row"><span class="detail-label">Monto vs. Gasolina</span><span class="detail-value"><span class="conf-badge conf-high">95% · Alta</span></span></div>'+
+'<div class="detail-row"><span class="detail-label">Proveedor</span><span class="detail-value"><span class="conf-badge conf-med">82% · Media</span></span></div>'+
+'<div class="detail-row"><span class="detail-label">Fecha/Hora</span><span class="detail-value"><span class="conf-badge conf-high">98% · Alta</span></span></div>'+
+'<div class="detail-row"><span class="detail-label">Placas</span><span class="detail-value"><span class="conf-badge conf-med">78% · Media</span></span></div>'+
+'<div style="margin-top:16px;padding:12px;background:#e6f2ef;border-radius:8px;font-size:13px;color:#6b6255"><strong> Foto:</strong> Comprobante recibido via WhatsApp el '+r.date+' a las 14:32 hrs.'+(r.match<75?'<br><span style="color:#b8433a"> Baja confianza — revision manual requerida</span>':'')+'</div>';
+m.classList.add('open');
+m.querySelector('.modal-footer').innerHTML=(r.status==='review'?'<button class="btn btn-success" onclick="markPaid(\''+r.id+'\')">Aprobar y Pagar</button>':'')+(r.status==='overdue'?'<button class="btn btn-danger" onclick="markPaid(\''+r.id+'\')">Pagar Vencido</button>':'')+(r.status==='pending'?'<button class="btn btn-primary" onclick="markPaid(\''+r.id+'\')">Pagar</button>':'')+'<button class="btn btn-outline" onclick="closeReceiptModal()">Cerrar</button>';
 }
-function closeReceiptModal(){
-  document.getElementById('receipt-modal').classList.remove('open');
-}
+
+function closeReceiptModal(){document.getElementById('receipt-modal').classList.remove('open')}
+
 function markPaid(id){
-  const r=RECEIPTS.find(x=>x.id===id);
-  if(!r) return;
-  r.status='paid';
-  const d=EMPLOYEES.find(e=>e.name===r.driver);
-  if(d){ d.paid+=r.amount; TOTALS.paidMXN+=r.amount; TOTALS.paid++; }
-  closeReceiptModal();
-  navigate(document.querySelector('.sidebar-nav a.active')?.dataset.page||'dashboard');
+const r=RECEIPTS.find(x=>x.id===id);
+if(!r)return;r.status='paid';TOTALS.paidMXN+=r.amount;TOTALS.paid++;
+closeReceiptModal();const a=document.querySelector('.sidebar-nav a.active');navigate(a?a.dataset.page:'dashboard');
 }
+
 function simulatePayment(eid,name,amount){
-  document.getElementById('confirm-modal').classList.add('open');
-  document.getElementById('confirm-modal').querySelector('.modal-body').innerHTML=`
-    <div class="confirm-dialog">
-      <div class="confirm-icon success"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <h3>✅ ¡Pago realizado!</h3>
-      <p>Se pagaron <strong>$${parseInt(amount).toLocaleString()} MXN</strong> a <strong>${name}</strong></p>
-      <p style="font-size:13px;color:var(--g-400);margin-top:8px">Comprobante: PAG-${Date.now().toString(36).toUpperCase()}</p>
-      <p style="font-size:12px;color:var(--g-400)">${new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})}</p>
-    </div>`;
-  document.getElementById('confirm-modal').querySelector('.modal-footer').innerHTML=`<button class="btn btn-primary" onclick="closeConfirm()">Aceptar</button>`;
-  const e=EMPLOYEES.find(x=>x.id===eid);
-  if(e){ e.paid=e.totalMXN; e.status='paid'; TOTALS.paidMXN+=e.totalMXN-e.paid; TOTALS.paid++; }
-}
-function closeConfirm(){
-  document.getElementById('confirm-modal').classList.remove('open');
-  navigate(document.querySelector('.sidebar-nav a.active')?.dataset.page||'dashboard');
+document.getElementById('confirm-modal').classList.add('open');
+const b=document.getElementById('confirm-modal').querySelector('.modal-body');
+b.innerHTML='<div class="confirm-dialog"><div class="confirm-icon success"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Pago realizado</h3><p>Se pagaron <strong>$'+parseInt(amount).toLocaleString()+' MXN</strong> a <strong>'+name+'</strong></p><p style="font-size:13px;color:#a89e8f;margin-top:8px">Comprobante: PAG-'+Date.now().toString(36).toUpperCase()+'</p><p style="font-size:12px;color:#a89e8f">'+new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'})+'</p></div>';
+document.getElementById('confirm-modal').querySelector('.modal-footer').innerHTML='<button class="btn btn-primary" onclick="closeConfirm()">Aceptar</button>';
+const e=EMPLOYEES.find(x=>x.id===eid);if(e){e.paid=parseInt(e.totalMXN);e.status='paid'}
 }
 
-// ─── FILTER ────────────────────────────────────────────────────────
+function closeConfirm(){document.getElementById('confirm-modal').classList.remove('open');const a=document.querySelector('.sidebar-nav a.active');navigate(a?a.dataset.page:'dashboard')}
+
 function filterReceipts(){
-  const q=document.getElementById('receipt-search')?.value?.toLowerCase()||'';
-  const f=document.getElementById('receipt-filter')?.value||'all';
-  document.querySelectorAll('#receipt-tbody tr').forEach(tr=>{
-    const match=(f==='all'||tr.dataset.status===f)&&(!q||tr.dataset.search?.toLowerCase().includes(q));
-    tr.style.display=match?'':'none';
-  });
+const q=(document.getElementById('receipt-search')?.value||'').toLowerCase();
+const f=document.getElementById('receipt-filter')?.value||'all';
+document.querySelectorAll('#receipt-tbody tr').forEach(tr=>{const m=(f==='all'||tr.dataset.status===f)&&(!q||(tr.dataset.search||'').toLowerCase().includes(q));tr.style.display=m?'':'none'});
 }
 
-// ─── INIT ──────────────────────────────────────────────────────────
 navigate('dashboard');
 </script>
 
-<!-- Modals -->
-<div class="modal-overlay" id="receipt-modal">
-  <div class="modal">
-    <div class="modal-header"><h2>Comprobante</h2><button class="modal-close" onclick="closeReceiptModal()">×</button></div>
-    <div class="modal-body"></div>
-    <div class="modal-footer"></div>
-  </div>
-</div>
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-body"></div>
-    <div class="modal-footer"></div>
-  </div>
-</div>
-
+<div class="modal-overlay" id="receipt-modal"><div class="modal"><div class="modal-header"><h2>Comprobante</h2><button class="modal-close" onclick="closeReceiptModal()">x</button></div><div class="modal-body"></div><div class="modal-footer"></div></div></div>
+<div class="modal-overlay" id="confirm-modal"><div class="modal" style="max-width:420px"><div class="modal-body"></div><div class="modal-footer"></div></div></div>
 </body>
 </html>
