@@ -7,6 +7,13 @@
   <meta name="description" content="Plataforma de gestión de comprobantes fiscales para flotillas" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/styles.css" />
+  <!-- Config: override API_BASE by setting this variable before api.js loads -->
+  <script>
+    // Change this URL to point to your backend
+    window.__RECEIPTSAI_API_URL__ = window.location.origin === 'file://'
+      ? 'http://localhost:8000'
+      : (window.location.origin + '/api');
+  </script>
 </head>
 <body>
   <div id="app"></div>
