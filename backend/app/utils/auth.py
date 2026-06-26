@@ -2,23 +2,22 @@
 
 import uuid
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
-from passlib.context import CryptContext
-from app.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
+from jose import jwt, JWTError
+from app.config import settings
 
 ALGORITHM = "HS256"
 
 
 def hash_password(password: str) -> str:
-    """Hash a plaintext password with bcrypt."""
-    return pwd_context.hash(password)
+    """Hash a plaintext password with bcrypt directly (no passlib)."""
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Check a plaintext password against its hash."""
-    return pwd_context.verify(plain, hashed)
+    """Check a plaintext password against its bcrypt hash."""
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
 def create_access_token(user_id: uuid.UUID, tenant_id: uuid.UUID, role: str) -> str:
