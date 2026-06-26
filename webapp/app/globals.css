@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-teal: #0d7675;
+  --color-teal-light: #aee1e1;
+  --color-teal-dark: #0b5f5e;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
