@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import init_db
-from app.routers import auth, receipts, drivers
+from app.routers import auth, receipts, drivers, billing
 
 # --- Logging setup ---
 logging.basicConfig(
@@ -55,6 +55,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(receipts.router)
 app.include_router(drivers.router)
+app.include_router(billing.router)
 
 
 # --- Health check ---
@@ -66,9 +67,12 @@ async def health():
 # --- Static files (frontend SPA) — mount AFTER API routes ---
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
 if os.path.isdir(frontend_dir):
-    # Mount the frontend at /app so index.html is served at /app/
-    # All static assets (js/, css/, assets/) are served under /app/ too
-    logger.info(f"Mounting frontend from {frontend_dir} at /app")
-    app.mount("/app", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+    # Mount the frontend so / (root) serves index.html
+    # All static assets (js/, css/, assets/) are served at the same root
+    logger.info(f"Mounting frontend from {frontend_dir} at /")
+    # Mount at root so the SPA is served at http://localhost:8000/
+    # API routes (auth, receipts, drivers, billing) take priority because
+    # they are registered before the StaticFiles mount
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 else:
     logger.warning(f"Frontend directory not found at {frontend_dir} — serving API only")
