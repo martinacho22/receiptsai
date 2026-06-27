@@ -9,20 +9,15 @@
   <link rel="stylesheet" href="css/styles.css" />
   <!-- Config: override API_BASE by setting this variable before api.js loads -->
   <script>
-    // When served by the same FastAPI process, the API is at the root.
-    // In dev (file:// or standalone), point at localhost:8000.
+    // Auto-detect API_BASE — works whether served by FastAPI (same origin)
+    // or opened standalone (file://) against a separate backend.
     window.__RECEIPTSAI_API_URL__ = (function() {
-      // If served via file://, assume standalone dev against localhost:8000
-      if (window.location.origin === 'file://' || window.location.origin === 'null') {
+      var origin = window.location.origin;
+      // file:// or null — assume standalone dev
+      if (origin === 'file://' || origin === 'null') {
         return 'http://localhost:8000';
       }
-      // If served by FastAPI (e.g. http://localhost:8000/app/), API is at root
-      var origin = window.location.origin;
-      // Check if we're mounted under a prefix by seeing if /app/ is in the path
-      if (window.location.pathname.startsWith('/app/')) {
-        return origin;  // API is at the root, e.g. http://localhost:8000/auth/login
-      }
-      // Fallback: assume API is at root
+      // Same origin — the API is right there at the root
       return origin;
     })();
   </script>
