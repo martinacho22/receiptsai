@@ -4,10 +4,12 @@ Run with: uvicorn app.main:app --reload
 """
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import init_db
@@ -43,7 +45,7 @@ app = FastAPI(
 # --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=["*"] if settings.environment == "development" else [settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,3 +61,14 @@ app.include_router(drivers.router)
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "receiptsai", "version": "0.1.0"}
+
+
+# --- Static files (frontend SPA) — mount AFTER API routes ---
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
+if os.path.isdir(frontend_dir):
+    # Mount the frontend at /app so index.html is served at /app/
+    # All static assets (js/, css/, assets/) are served under /app/ too
+    logger.info(f"Mounting frontend from {frontend_dir} at /app")
+    app.mount("/app", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+else:
+    logger.warning(f"Frontend directory not found at {frontend_dir} — serving API only")
