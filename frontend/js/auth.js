@@ -74,8 +74,9 @@ function renderAuthPage() {
     btn.textContent = isLogin ? 'Entrando...' : 'Creando cuenta...';
 
     try {
+      let data;
       if (isLogin) {
-        const data = await apiCall('/auth/login', {
+        data = await apiCall('/auth/login', {
           method: 'POST',
           auth: false,
           body: {
@@ -83,10 +84,8 @@ function renderAuthPage() {
             password: document.getElementById('password').value,
           },
         });
-        storeLogin(data);
-        navigateTo('dashboard');
       } else {
-        const data = await apiCall('/auth/register', {
+        data = await apiCall('/auth/register', {
           method: 'POST',
           auth: false,
           body: {
@@ -97,14 +96,11 @@ function renderAuthPage() {
             password: document.getElementById('password').value,
           },
         });
-        // Registration returns { message, tenant_id } but no token
-        // Show success and prompt to log in
-        errorEl.style.background = '#e8f5e9';
-        errorEl.style.color = '#2e7d32';
-        errorEl.textContent = 'Cuenta creada. Ahora inicia sesión.';
-        errorEl.classList.add('show');
-        setTimeout(() => { window.location.hash = '#login'; }, 1500);
       }
+
+      // Both login and register now return AuthResponse with access_token + user
+      storeLogin(data);
+      navigateTo('dashboard');
     } catch (err) {
       errorEl.style.background = '';
       errorEl.style.color = '';

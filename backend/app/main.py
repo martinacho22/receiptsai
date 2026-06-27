@@ -4,14 +4,16 @@ Run with: uvicorn app.main:app --reload
 """
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import init_db
-from app.routers import auth, receipts, drivers
+from app.routers import auth, receipts, drivers, billing
 
 # --- Logging setup ---
 logging.basicConfig(
@@ -43,7 +45,7 @@ app = FastAPI(
 # --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=["*"] if settings.environment == "development" else [settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,9 +55,24 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(receipts.router)
 app.include_router(drivers.router)
+app.include_router(billing.router)
 
 
 # --- Health check ---
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "receiptsai", "version": "0.1.0"}
+
+
+# --- Static files (frontend SPA) — mount AFTER API routes ---
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
+if os.path.isdir(frontend_dir):
+    # Mount the frontend so / (root) serves index.html
+    # All static assets (js/, css/, assets/) are served at the same root
+    logger.info(f"Mounting frontend from {frontend_dir} at /")
+    # Mount at root so the SPA is served at http://localhost:8000/
+    # API routes (auth, receipts, drivers, billing) take priority because
+    # they are registered before the StaticFiles mount
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+else:
+    logger.warning(f"Frontend directory not found at {frontend_dir} — serving API only")

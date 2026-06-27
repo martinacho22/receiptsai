@@ -2,11 +2,13 @@
 
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from pydantic import BaseModel
 from app.database import get_db
 from app.models.user import User
+from app.models.receipt import Receipt
 
 router = APIRouter(prefix="/drivers", tags=["drivers"])
 
@@ -23,8 +25,9 @@ class DriverOut(BaseModel):
     name: str
     phone: str
     email: str | None = None
-    is_active: bool
+    whatsapp_subscribed: bool = True
     receipt_count: int = 0
+    is_active: bool
 
     class Config:
         from_attributes = True
@@ -35,7 +38,7 @@ async def list_drivers(
     tenant_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """List all active drivers for a company."""
+    """List all active drivers for a company, with receipt counts."""
     result = await db.execute(
         select(User).where(
             User.tenant_id == tenant_id,
@@ -45,12 +48,25 @@ async def list_drivers(
     )
     drivers = result.scalars().all()
 
+    # Build receipt counts per driver
+    driver_ids = [d.id for d in drivers]
+    count_rows = {}
+    if driver_ids:
+        count_result = await db.execute(
+            select(Receipt.driver_id, func.count(Receipt.id))
+            .where(Receipt.driver_id.in_(driver_ids))
+            .group_by(Receipt.driver_id)
+        )
+        count_rows = dict(count_result.all())
+
     return [
         DriverOut(
             id=str(d.id),
             name=d.name,
             phone=d.phone,
             email=d.email,
+            whatsapp_subscribed=d.whatsapp_subscribed,
+            receipt_count=count_rows.get(d.id, 0),
             is_active=d.is_active,
         )
         for d in drivers

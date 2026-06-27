@@ -9,10 +9,17 @@
   <link rel="stylesheet" href="css/styles.css" />
   <!-- Config: override API_BASE by setting this variable before api.js loads -->
   <script>
-    // Change this URL to point to your backend
-    window.__RECEIPTSAI_API_URL__ = window.location.origin === 'file://'
-      ? 'http://localhost:8000'
-      : (window.location.origin + '/api');
+    // Auto-detect API_BASE — works whether served by FastAPI (same origin)
+    // or opened standalone (file://) against a separate backend.
+    window.__RECEIPTSAI_API_URL__ = (function() {
+      var origin = window.location.origin;
+      // file:// or null — assume standalone dev
+      if (origin === 'file://' || origin === 'null') {
+        return 'http://localhost:8000';
+      }
+      // Same origin — the API is right there at the root
+      return origin;
+    })();
   </script>
 </head>
 <body>
