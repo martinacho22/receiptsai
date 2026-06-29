@@ -35,10 +35,10 @@ for eid, name, veh, link, rids in _emp_data:
     EMP.append({"id": eid, "name": name, "vehicle": veh, "linked": link, "receipts": rids})
 
 _rec_data = [
-    ("R001","E001","Gasolinera PEMEX León",     "2026-06-22",120,23.80,2856.00,"in_review",0.97),
-    ("R002","E001","Gasolinera Oxxo Gas Silao", "2026-06-20",85, 23.50,1997.50,"in_review",0.88),
+    ("R001","E001","Gasolinera PEMEX León",     "2026-06-22",120,23.80,2856.00,"pending",0.97),
+    ("R002","E001","Gasolinera Oxxo Gas Silao", "2026-06-20",85, 23.50,1997.50,"pending",0.88),
     ("R003","E001","PEMEX Irapuato",            "2026-06-18",95, 23.75,2256.25,"pending",  0.95),
-    ("R004","E002","Gasolinera La Piedad",      "2026-06-21",200,23.60,4720.00,"in_review",0.72),
+    ("R004","E002","Gasolinera La Piedad",      "2026-06-21",200,23.60,4720.00,"pending",0.72),
     ("R005","E002","PEMEX Salamanca",           "2026-06-19",180,23.40,4212.00,"approved", 0.99),
     ("R006","E003","Oxxo Gas Celaya",           "2026-06-23",60, 23.90,1434.00,"pending",  0.93),
     ("R007","E004","PEMEX Querétaro",           "2026-06-17",150,23.55,3532.50,"paid",     0.96),
@@ -52,7 +52,7 @@ for rid, eid, ven, dt, lit, ppl, amt, st, conf in _rec_data:
                 "currency":"MXN", "status": st, "confidence": conf,
                 "photo": "receipt_placeholder"})
 
-STATUS_LABELS = {"pending":"Pendiente","in_review":"En revisión","approved":"Aprobado","paid":"Pagado"}
+STATUS_LABELS = {"pending":"Pendiente","approved":"Aprobado","paid":"Pagado"}
 
 # Check icon constants shared between Python-generate HTML and JS-template HTML
 CHECK_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
@@ -68,10 +68,10 @@ def total_owed():
     return sum(r["amount"] for r in REC)
 
 def pending_review_count():
-    return sum(1 for r in REC if r["status"]=="in_review")
+    return sum(1 for r in REC if r["status"]=="pending")
 
 def pending_review_amount():
-    return sum(r["amount"] for r in REC if r["status"]=="in_review")
+    return sum(r["amount"] for r in REC if r["status"]=="pending")
 
 def emp_total(e):
     return sum(REC[i]["amount"] for i in e["receipts"])
@@ -83,7 +83,7 @@ def emp_approved(e):
     return sum(REC[i]["amount"] for i in e["receipts"] if REC[i]["status"]=="approved")
 
 def emp_pending(e):
-    return sum(REC[i]["amount"] for i in e["receipts"] if REC[i]["status"] in ("pending","in_review"))
+    return sum(REC[i]["amount"] for i in e["receipts"] if REC[i]["status"]=="pending")
 
 def fee_total():
     return sum(r["amount"] for r in REC if r["status"] in ("paid","approved"))
@@ -174,7 +174,7 @@ def build():
     rec_rows = []
     for r in REC:
         emp_name = [e["name"] for e in EMP if e["id"]==r["emp_id"]][0]
-        lbl = STATUS_LABELS[r["status"]]
+        lbl = STATUS_LABELS.get(r["status"], r["status"])
         paid_cls = "paid" if r["status"]=="paid" else ""
         rec_rows.append(f'''<tr class="{paid_cls}" data-id="{r["id"]}">
           <td style="color:var(--g-500);font-size:13px;">{r["id"]}</td>
@@ -307,7 +307,6 @@ def build():
   /* ── Badges ── */
   .badge {{ display:inline-flex; align-items:center; gap:4px; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:500; }}
   .badge-pending {{ background:var(--amber-bg); color:var(--amber); }}
-  .badge-in_review {{ background:#eff6ff; color:var(--blue); }}
   .badge-approved {{ background:#ecfdf5; color:var(--green); }}
   .badge-paid {{ background:var(--g-100); color:var(--g-500); }}
   /* Inline icon colors for linked/unlinked text */
@@ -514,7 +513,6 @@ def build():
           <select style="padding:8px 12px;border:1px solid var(--g-300);border-radius:var(--radius-sm);font-size:13px;">
             <option>Todos los estados</option>
             <option>Pendiente</option>
-            <option>En revisi&oacute;n</option>
             <option>Aprobado</option>
             <option>Pagado</option>
           </select>
@@ -712,7 +710,7 @@ def build():
     }}
 
     // Actions visibility
-    var canAct = (r.status === 'in_review' || r.status === 'pending');
+    var canAct = (r.status === 'pending');
     document.getElementById('btn-approve').style.display = canAct ? '' : 'none';
     document.getElementById('btn-reject').style.display = canAct ? '' : 'none';
 
