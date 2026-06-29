@@ -56,7 +56,7 @@ async function apiCall(endpoint, options = {}) {
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch (err) {
-    throw new Error(`Network error — is the backend running at ${API_BASE}?`);
+    throw new Error(__( 'network_error' ));
   }
 
   // Handle 401
@@ -64,7 +64,7 @@ async function apiCall(endpoint, options = {}) {
     localStorage.removeItem('receiptsai_token');
     localStorage.removeItem('receiptsai_user');
     window.location.hash = '#login';
-    throw new Error('Session expired — please log in again');
+    throw new Error(__( 'session_expired' ));
   }
 
   // Parse
@@ -85,11 +85,21 @@ async function apiCall(endpoint, options = {}) {
 
 /**
  * Store user info (from login response) in localStorage.
+ * FIXED: Backend returns { access_token, user: { id, tenant_id, company_name, role } }
+ * — destructure from the nested 'user' object, not the top level.
  */
 function storeLogin(response) {
-  const { access_token, user_id, tenant_id, role } = response;
+  const { access_token, user } = response;
+  if (!user || !user.id || !user.tenant_id) {
+    throw new Error('Invalid login response: missing user data');
+  }
   localStorage.setItem('receiptsai_token', access_token);
-  localStorage.setItem('receiptsai_user', JSON.stringify({ user_id, tenant_id, role }));
+  localStorage.setItem('receiptsai_user', JSON.stringify({
+    user_id: user.id,
+    tenant_id: user.tenant_id,
+    role: user.role,
+    company_name: user.company_name || '',
+  }));
 }
 
 /**
