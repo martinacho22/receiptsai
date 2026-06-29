@@ -5,7 +5,8 @@
  * and auth guard. This is the entry point after all modules load.
  */
 
-const PAGES = ['dashboard', 'comprobantes', 'conductores', 'configuracion'];
+const PAGES = ['dashboard', 'comprobantes', 'conductores', 'configuracion', 'pagar'];
+const ADMIN_PAGES = ['conductores', 'configuracion'];
 let currentPage = null;
 
 /**
@@ -23,12 +24,20 @@ function navigateTo(page) {
  * Render the sidebar navigation.
  */
 function renderSidebar(current) {
+  const user = getStoredUser();
+  const role = user?.role || 'admin';
+
   const navItems = [
     { id: 'dashboard',     label: 'Dashboard',        icon: '📊' },
+    { id: 'pagar',         label: 'A Pagar',          icon: '💰' },
     { id: 'comprobantes',  label: 'Comprobantes',     icon: '📄' },
-    { id: 'conductores',   label: 'Conductores',      icon: '👤' },
-    { id: 'configuracion', label: 'Configuración',    icon: '⚙️' },
   ];
+
+  // Only admin/boss can see Conductores and Configuración
+  if (role === 'admin') {
+    navItems.push({ id: 'conductores', label: 'Conductores', icon: '👤' });
+    navItems.push({ id: 'configuracion', label: 'Configuración', icon: '⚙️' });
+  }
 
   return `
     <div class="sidebar">
@@ -45,7 +54,7 @@ function renderSidebar(current) {
         `).join('')}
       </nav>
       <div class="sidebar-footer">
-        <span style="font-size:0.8rem;color:var(--text-muted)">${getStoredUser()?.role || ''}</span>
+        <span style="font-size:0.8rem;color:var(--text-muted)">${role}</span>
         <button class="btn btn-sm btn-outline" id="logoutBtn">Salir</button>
       </div>
     </div>
@@ -111,8 +120,11 @@ function route() {
     window.location.hash = '#dashboard';
   }
 
-  // Validate page
-  if (!PAGES.includes(hash)) {
+  const user = getStoredUser();
+  const role = user?.role || 'admin';
+
+  // Validate page — drivers cannot access admin pages
+  if (!PAGES.includes(hash) || (role !== 'admin' && ADMIN_PAGES.includes(hash))) {
     hash = 'dashboard';
     window.location.hash = '#dashboard';
   }
@@ -124,6 +136,9 @@ function route() {
   switch (hash) {
     case 'dashboard':
       renderDashboard(container);
+      break;
+    case 'pagar':
+      renderPagar(container);
       break;
     case 'comprobantes':
       renderComprobantes(container);
@@ -143,6 +158,7 @@ function route() {
 function getPageTitle(page) {
   const titles = {
     dashboard: 'Dashboard',
+    pagar: 'A Pagar',
     comprobantes: 'Comprobantes',
     conductores: 'Conductores',
     configuracion: 'Configuración',
