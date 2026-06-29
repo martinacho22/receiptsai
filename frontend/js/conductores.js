@@ -6,7 +6,7 @@
  */
 
 async function renderConductores(container) {
-  container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando conductores...</div>';
+  container.innerHTML = `<div class="loading"><div class="spinner"></div>${__('loading')}</div>`;
 
   try {
     const drivers = await apiCall('/drivers');
@@ -14,27 +14,27 @@ async function renderConductores(container) {
 
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <h1 class="page-title" style="margin-bottom:0;">Conductores</h1>
-        <button class="btn btn-primary" id="addDriverBtn">+ Invitar conductor</button>
+        <h1 class="page-title" style="margin-bottom:0;">${__('drivers.title')}</h1>
+        <button class="btn btn-primary" id="addDriverBtn">${__('drivers.invite')}</button>
       </div>
-      <p class="page-subtitle">Gestiona los conductores de tu flotilla</p>
+      <p class="page-subtitle">${__('drivers.subtitle')}</p>
 
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Correo</th>
-              <th class="text-center">WhatsApp</th>
-              <th class="text-center">Comprobantes</th>
-              <th class="text-center">Estado</th>
-              <th class="text-center">Acción</th>
+              <th>${__('drivers.name')}</th>
+              <th>${__('drivers.phone')}</th>
+              <th>${__('drivers.email')}</th>
+              <th class="text-center">${__('drivers.whatsapp')}</th>
+              <th class="text-center">${__('drivers.receipts')}</th>
+              <th class="text-center">${__('drivers.status')}</th>
+              <th class="text-center">${__('drivers.action')}</th>
             </tr>
           </thead>
           <tbody>
             ${driversList.length === 0
-              ? '<tr><td colspan="7" class="text-center" style="color:var(--text-muted);padding:32px;">No hay conductores registrados</td></tr>'
+              ? `<tr><td colspan="7" class="text-center" style="color:var(--text-muted);padding:32px;">${__('drivers.no_drivers')}</td></tr>`
               : driversList.map(d => `
                 <tr data-id="${d.id}">
                   <td class="font-semibold">${escapeHtml(d.name)}</td>
@@ -42,15 +42,18 @@ async function renderConductores(container) {
                   <td>${escapeHtml(d.email || '—')}</td>
                   <td class="text-center">
                     <span class="badge" style="background:${d.whatsapp_subscribed !== false ? '#e8f5e9' : '#fce4ec'};color:${d.whatsapp_subscribed !== false ? '#2e7d32' : '#c62828'}">
-                      ${d.whatsapp_subscribed !== false ? '✅ Activo' : '❌ Inactivo'}
+                      <span style="display:inline-flex;align-items:center;gap:4px;">
+                        ${d.whatsapp_subscribed !== false ? ICON.check : ICON.x}
+                        ${d.whatsapp_subscribed !== false ? __('drivers.whatsapp_active') : __('drivers.whatsapp_inactive')}
+                      </span>
                     </span>
                   </td>
                   <td class="text-center">${d.receipt_count || 0}</td>
                   <td class="text-center">
-                    <span class="badge ${d.is_active ? 'approved' : 'rejected'}">${d.is_active ? 'Activo' : 'Inactivo'}</span>
+                    <span class="badge ${d.is_active ? 'approved' : 'rejected'}">${d.is_active ? __('drivers.active') : __('drivers.inactive')}</span>
                   </td>
                   <td class="text-center">
-                    <button class="btn btn-sm btn-danger remove-driver-btn" data-id="${d.id}" data-name="${escapeHtml(d.name)}">Eliminar</button>
+                    <button class="btn btn-sm btn-danger remove-driver-btn" data-id="${d.id}" data-name="${escapeHtml(d.name)}">${__('drivers.remove')}</button>
                   </td>
                 </tr>
               `).join('')}
@@ -62,27 +65,27 @@ async function renderConductores(container) {
       <div class="modal-overlay" id="addDriverModal">
         <div class="modal" style="max-width:480px;">
           <div class="modal-header">
-            <h2>Invitar conductor</h2>
+            <h2>${__('drivers.modal_title')}</h2>
             <button class="modal-close" id="addModalClose">&times;</button>
           </div>
           <form id="addDriverForm">
             <div class="modal-body">
               <div class="form-group">
-                <label for="driverName">Nombre completo</label>
-                <input type="text" id="driverName" class="form-input" placeholder="Juan Pérez" required />
+                <label for="driverName">${__('drivers.full_name')}</label>
+                <input type="text" id="driverName" class="form-input" placeholder="${__('drivers.full_name_placeholder')}" required />
               </div>
               <div class="form-group">
-                <label for="driverPhone">Teléfono (WhatsApp)</label>
-                <input type="tel" id="driverPhone" class="form-input" placeholder="+521234567890" required />
+                <label for="driverPhone">${__('drivers.phone_whatsapp')}</label>
+                <input type="tel" id="driverPhone" class="form-input" placeholder="${__('drivers.phone_placeholder')}" required />
               </div>
               <div class="form-group">
-                <label for="driverEmail">Correo electrónico <span style="color:var(--text-muted);font-size:0.8rem;">(opcional)</span></label>
-                <input type="email" id="driverEmail" class="form-input" placeholder="juan@example.com" />
+                <label for="driverEmail">${__('drivers.email_optional')}</label>
+                <input type="email" id="driverEmail" class="form-input" placeholder="${__('drivers.email_placeholder')}" />
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-outline" id="addModalCancel">Cancelar</button>
-              <button type="submit" class="btn btn-primary" id="addDriverSubmit">Invitar</button>
+              <button type="button" class="btn btn-outline" id="addModalCancel">${__('drivers.cancel')}</button>
+              <button type="submit" class="btn btn-primary" id="addDriverSubmit">${__('drivers.invite')}</button>
             </div>
           </form>
         </div>
@@ -105,7 +108,7 @@ async function renderConductores(container) {
       e.preventDefault();
       const btn = document.getElementById('addDriverSubmit');
       btn.disabled = true;
-      btn.textContent = 'Guardando...';
+      btn.textContent = __('drivers.saving');
       try {
         const tenantId = getTenantId();
         await apiCall('/drivers', {
@@ -117,14 +120,14 @@ async function renderConductores(container) {
             email: document.getElementById('driverEmail').value.trim() || undefined,
           },
         });
-        showToast('Conductor agregado exitosamente', 'success');
+        showToast(__('drivers.added_msg'), 'success');
         addModal.classList.remove('active');
         route(); // Refresh
       } catch (err) {
-        showToast(`Error: ${err.message}`, 'error');
+        showToast(`${__('error')} ${err.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Invitar';
+        btn.textContent = __('drivers.invite');
       }
     });
 
@@ -133,13 +136,13 @@ async function renderConductores(container) {
       btn.addEventListener('click', async () => {
         const driverId = btn.dataset.id;
         const driverName = btn.dataset.name;
-        if (!confirm(`¿Eliminar a ${driverName}? Los comprobantes existentes no se eliminarán.`)) return;
+        if (!confirm(`${__('drivers.confirm_remove')} ${driverName}${__('drivers.remove_suffix')}`)) return;
         try {
           await apiCall(`/drivers/${driverId}`, { method: 'DELETE' });
-          showToast(`Conductor ${driverName} eliminado`, 'info');
+          showToast(`${__('drivers.name')} ${driverName} ${__('drivers.removed_msg')}`, 'info');
           route(); // Refresh
         } catch (err) {
-          showToast(`Error: ${err.message}`, 'error');
+          showToast(`${__('error')} ${err.message}`, 'error');
         }
       });
     });
@@ -147,12 +150,12 @@ async function renderConductores(container) {
   } catch (err) {
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <h1 class="page-title" style="margin-bottom:0;">Conductores</h1>
+        <h1 class="page-title" style="margin-bottom:0;">${__('drivers.title')}</h1>
       </div>
-      <p class="page-subtitle">Gestiona los conductores de tu flotilla</p>
+      <p class="page-subtitle">${__('drivers.subtitle')}</p>
       <div class="table-container" style="padding:40px;text-align:center;color:var(--danger);">
-        <p>Error al cargar: ${escapeHtml(err.message)}</p>
-        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">Reintentar</button>
+        <p>${__('error_loading')} ${escapeHtml(err.message)}</p>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">${__('retry')}</button>
       </div>
     `;
   }

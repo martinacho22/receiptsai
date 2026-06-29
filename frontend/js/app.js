@@ -24,10 +24,10 @@ function navigateTo(page) {
  */
 function renderSidebar(current) {
   const navItems = [
-    { id: 'dashboard',     label: 'Dashboard',        icon: '📊' },
-    { id: 'comprobantes',  label: 'Comprobantes',     icon: '📄' },
-    { id: 'conductores',   label: 'Conductores',      icon: '👤' },
-    { id: 'configuracion', label: 'Configuración',    icon: '⚙️' },
+    { id: 'dashboard',     label: __('nav.dashboard'),     icon: 'dashboard' },
+    { id: 'comprobantes',  label: __('nav.comprobantes'),  icon: 'receipt' },
+    { id: 'conductores',   label: __('nav.conductores'),   icon: 'users' },
+    { id: 'configuracion', label: __('nav.configuracion'), icon: 'settings' },
   ];
 
   return `
@@ -39,14 +39,14 @@ function renderSidebar(current) {
       <nav class="sidebar-nav">
         ${navItems.map(item => `
           <a href="#${item.id}" class="${current === item.id ? 'active' : ''}" data-page="${item.id}">
-            <span class="icon">${item.icon}</span>
+            <span class="icon">${ICON[item.icon]}</span>
             ${item.label}
           </a>
         `).join('')}
       </nav>
       <div class="sidebar-footer">
-        <span style="font-size:0.8rem;color:var(--text-muted)">${getStoredUser()?.role || ''}</span>
-        <button class="btn btn-sm btn-outline" id="logoutBtn">Salir</button>
+        <div style="font-size:0.8rem;color:var(--text-muted);">${getStoredUser()?.role || ''}</div>
+        <button class="btn btn-sm btn-outline" id="logoutBtn">${__('nav.salir')}</button>
       </div>
     </div>
   `;
@@ -57,15 +57,23 @@ function renderSidebar(current) {
  */
 function renderAppLayout(page) {
   const user = getStoredUser();
+  const displayName = user?.company_name || user?.user_id?.slice(0, 8) || '';
+  const avatarLetter = user?.company_name
+    ? user.company_name.charAt(0).toUpperCase()
+    : user?.user_id?.slice(0, 1).toUpperCase() || '?';
+
   const app = document.getElementById('app');
   app.className = '';
   app.innerHTML = `
     ${renderSidebar(page)}
     <div class="header">
       <div class="header-title" id="pageTitle">${getPageTitle(page)}</div>
-      <div class="header-user">
-        <span>${user ? user.user_id?.slice(0, 8) + '...' : ''}</span>
-        <div class="avatar">${user ? user.user_id?.slice(0, 1).toUpperCase() : '?'}</div>
+      <div class="header-right">
+        ${renderLangToggle()}
+        <div class="header-user">
+          <span>${displayName}</span>
+          <div class="avatar">${avatarLetter}</div>
+        </div>
       </div>
     </div>
     <div class="main-content">
@@ -73,6 +81,9 @@ function renderAppLayout(page) {
     </div>
     <div class="toast-container" id="toastContainer"></div>
   `;
+
+  // Language toggle event handlers
+  initLangToggle();
 
   // Sidebar nav clicks
   document.querySelectorAll('.sidebar-nav a').forEach(a => {
@@ -142,10 +153,10 @@ function route() {
  */
 function getPageTitle(page) {
   const titles = {
-    dashboard: 'Dashboard',
-    comprobantes: 'Comprobantes',
-    conductores: 'Conductores',
-    configuracion: 'Configuración',
+    dashboard: __('dashboard.title'),
+    comprobantes: __('receipts.title'),
+    conductores: __('drivers.title'),
+    configuracion: __('settings.title'),
   };
   return titles[page] || 'ReceiptsAI';
 }
@@ -203,3 +214,4 @@ window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.navigateTo = navigateTo;
+window.route = route;

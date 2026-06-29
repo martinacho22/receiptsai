@@ -5,7 +5,7 @@
  */
 
 async function renderConfiguracion(container) {
-  container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando configuración...</div>';
+  container.innerHTML = `<div class="loading"><div class="spinner"></div>${__('loading')}</div>`;
 
   try {
     const usage = await apiCall('/billing/usage');
@@ -16,55 +16,55 @@ async function renderConfiguracion(container) {
       : 0;
 
     container.innerHTML = `
-      <h1 class="page-title">Configuración</h1>
-      <p class="page-subtitle">Información de tu cuenta y planes disponibles</p>
+      <h1 class="page-title">${__('settings.title')}</h1>
+      <p class="page-subtitle">${__('settings.subtitle')}</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
         <!-- Company Info -->
         <div class="table-container" style="padding:24px;">
-          <h2 style="font-size:1.1rem;margin-bottom:16px;">Información de la empresa</h2>
+          <h2 style="font-size:1.1rem;margin-bottom:16px;">${__('settings.company_info')}</h2>
           <div class="form-group">
-            <label>Empresa</label>
+            <label>${__('settings.company')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">
               ${escapeHtml(usage.company_name)}
             </div>
           </div>
           <div class="form-group">
-            <label>ID de empresa (Tenant)</label>
+            <label>${__('settings.tenant_id')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;font-family:monospace;font-size:0.8rem;">
               ${user ? user.tenant_id : '—'}
             </div>
           </div>
           <div class="form-group">
-            <label>Plan actual</label>
+            <label>${__('settings.current_plan')}</label>
             <div style="display:flex;align-items:center;gap:8px;">
               <div class="form-input" style="background:var(--bg);cursor:default;flex:1;text-transform:capitalize;">
                 ${usage.plan || 'Trial'}
               </div>
               <span class="badge ${usage.status === 'active' || usage.status === 'trialing' ? 'approved' : 'rejected'}">
-                ${usage.status === 'active' ? 'Activo' : usage.status === 'trialing' ? 'Prueba' : usage.status}
+                ${usage.status === 'active' ? __('settings.active') : usage.status === 'trialing' ? __('settings.trial') : usage.status}
               </span>
             </div>
           </div>
           <div class="form-group">
-            <label>Comprobantes este mes</label>
+            <label>${__('settings.receipts_month')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">${usage.receipt_count || 0}</div>
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label>Límite del plan</label>
+            <label>${__('settings.plan_limit')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">
-              ${usage.receipt_limit ? `${usage.receipt_limit} comprobantes/mes` : 'Ilimitado'}
+              ${usage.receipt_limit ? `${usage.receipt_limit} ${__('settings.per_month')}` : __('settings.unlimited')}
             </div>
           </div>
         </div>
 
         <!-- Usage -->
         <div class="table-container" style="padding:24px;">
-          <h2 style="font-size:1.1rem;margin-bottom:16px;">Uso actual</h2>
+          <h2 style="font-size:1.1rem;margin-bottom:16px;">${__('settings.usage')}</h2>
           <div style="margin-bottom:16px;">
             <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;">
-              <span>Comprobantes este mes</span>
-              <span class="font-semibold">${usage.receipt_count} de ${usage.receipt_limit || '∞'}</span>
+              <span>${__('settings.receipts_month')}</span>
+              <span class="font-semibold">${usage.receipt_count} ${__('receipts.of')} ${usage.receipt_limit || '∞'}</span>
             </div>
             <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
               <div style="height:100%;width:${receiptPct}%;background:${receiptPct > 80 ? 'var(--warning)' : receiptPct > 95 ? 'var(--danger)' : 'var(--primary)'};border-radius:4px;transition:width 0.3s;"></div>
@@ -72,21 +72,21 @@ async function renderConfiguracion(container) {
           </div>
           <div style="margin-bottom:16px;">
             <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;">
-              <span>Conductores activos</span>
-              <span class="font-semibold">${usage.driver_count} de ${usage.max_drivers}</span>
+              <span>${__('settings.active_drivers')}</span>
+              <span class="font-semibold">${usage.driver_count} ${__('receipts.of')} ${usage.max_drivers}</span>
             </div>
             <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
               <div style="height:100%;width:${Math.min(100, Math.round((usage.driver_count / Math.max(1, usage.max_drivers)) * 100))}%;background:var(--primary);border-radius:4px;transition:width 0.3s;"></div>
             </div>
           </div>
           <p style="font-size:0.85rem;color:var(--text-muted);">
-            Los límites de facturación se actualizan según tu plan de suscripción.
+            ${__('settings.usage_note')}
           </p>
         </div>
       </div>
 
       <!-- Pricing Plans -->
-      <h2 style="font-size:1.1rem;margin:32px 0 16px;">Planes disponibles</h2>
+      <h2 style="font-size:1.1rem;margin:32px 0 16px;">${__('settings.plans')}</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;">
         ${renderPlanCard('Básico', '$400', 'Hasta 100 comprobantes/mes', 'Hasta 5 conductores', 'Soporte por correo', false, usage.plan)}
         ${renderPlanCard('Profesional', '$1,000', 'Hasta 500 comprobantes/mes', 'Hasta 20 conductores', 'Soporte prioritario', true, usage.plan)}
@@ -96,11 +96,11 @@ async function renderConfiguracion(container) {
     `;
   } catch (err) {
     container.innerHTML = `
-      <h1 class="page-title">Configuración</h1>
-      <p class="page-subtitle">Información de tu cuenta y planes disponibles</p>
+      <h1 class="page-title">${__('settings.title')}</h1>
+      <p class="page-subtitle">${__('settings.subtitle')}</p>
       <div class="table-container" style="padding:40px;text-align:center;color:var(--danger);">
-        <p>Error al cargar: ${escapeHtml(err.message)}</p>
-        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">Reintentar</button>
+        <p>${__('error_loading')} ${escapeHtml(err.message)}</p>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">${__('retry')}</button>
       </div>
     `;
   }
@@ -114,15 +114,15 @@ function renderPlanCard(name, price, feature1, feature2, feature3, isCurrent, cu
     <div class="table-container" style="padding:24px;text-align:center;${isActivePlan ? 'border:2px solid var(--primary);' : ''}">
       <h3 style="font-size:1rem;margin-bottom:4px;">${name}</h3>
       <div style="font-size:2rem;font-weight:800;color:var(--primary);margin:8px 0;">${price}</div>
-      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;">/mes</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;">${__('settings.per_month_suffix')}</div>
       <ul style="list-style:none;padding:0;margin:16px 0;text-align:left;font-size:0.85rem;">
-        <li style="padding:4px 0;">✓ ${feature1}</li>
-        <li style="padding:4px 0;">✓ ${feature2}</li>
-        <li style="padding:4px 0;">✓ ${feature3}</li>
+        <li style="padding:4px 0;">${ICON.check} ${feature1}</li>
+        <li style="padding:4px 0;">${ICON.check} ${feature2}</li>
+        <li style="padding:4px 0;">${ICON.check} ${feature3}</li>
       </ul>
       ${isActivePlan
-        ? '<span class="badge approved" style="padding:6px 16px;">Plan actual</span>'
-        : '<button class="btn btn-outline btn-sm" disabled>Próximamente</button>'
+        ? `<span class="badge approved" style="padding:6px 16px;">${__('settings.current_badge')}</span>`
+        : `<button class="btn btn-outline btn-sm" disabled>${__('settings.coming_soon')}</button>`
       }
     </div>
   `;

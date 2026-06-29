@@ -7,27 +7,27 @@
  */
 
 async function renderComprobantes(container) {
-  container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando comprobantes...</div>';
+  container.innerHTML = `<div class="loading"><div class="spinner"></div>${__('loading')}</div>`;
 
   try {
     const receipts = await apiCall('/receipts', { params: { limit: 200 } });
     const receiptsList = receipts || [];
 
     container.innerHTML = `
-      <h1 class="page-title">Comprobantes</h1>
-      <p class="page-subtitle">Todos los comprobantes fiscales de tu flotilla</p>
+      <h1 class="page-title">${__('receipts.title')}</h1>
+      <p class="page-subtitle">${__('receipts.subtitle')}</p>
 
       <div class="filter-bar">
-        <input type="text" class="form-input" id="searchInput" placeholder="Buscar por proveedor, empleado..." />
+        <input type="text" class="form-input" id="searchInput" placeholder="${__('receipts.search')}" />
         <select class="form-select" id="statusFilter">
-          <option value="">Todos los estados</option>
-          <option value="pending">Pendientes</option>
-          <option value="approved">Aprobados</option>
-          <option value="paid">Pagados</option>
-          <option value="rejected">Rechazados</option>
+          <option value="">${__('receipts.all_statuses')}</option>
+          <option value="pending">${__('receipts.pending')}</option>
+          <option value="approved">${__('receipts.approved')}</option>
+          <option value="paid">${__('receipts.paid')}</option>
+          <option value="rejected">${__('receipts.rejected')}</option>
         </select>
         <span style="font-size:0.85rem;color:var(--text-muted);margin-left:auto;">
-          ${receiptsList.length} comprobantes
+          ${receiptsList.length} ${__('receipts.receipts')}
         </span>
       </div>
 
@@ -35,19 +35,19 @@ async function renderComprobantes(container) {
         <table>
           <thead>
             <tr>
-              <th>Folio</th>
-              <th>Empleado</th>
-              <th>Proveedor</th>
-              <th>Fecha</th>
-              <th>Categoría</th>
-              <th class="text-right">Monto</th>
-              <th>Estado</th>
-              <th class="text-center">Detalle</th>
+              <th>${__('receipts.folio')}</th>
+              <th>${__('receipts.employee')}</th>
+              <th>${__('receipts.vendor')}</th>
+              <th>${__('receipts.date')}</th>
+              <th>${__('receipts.category')}</th>
+              <th class="text-right">${__('receipts.amount')}</th>
+              <th>${__('receipts.status')}</th>
+              <th class="text-center">${__('receipts.detail')}</th>
             </tr>
           </thead>
           <tbody id="receiptsBody">
             ${receiptsList.length === 0
-              ? '<tr><td colspan="8" class="text-center" style="color:var(--text-muted);padding:32px;">No hay comprobantes registrados</td></tr>'
+              ? `<tr><td colspan="8" class="text-center" style="color:var(--text-muted);padding:32px;">${__('receipts.no_receipts')}</td></tr>`
               : receiptsList.map(r => `
                 <tr class="receipt-row" data-id="${r.id}">
                   <td class="font-mono">${r.id.slice(0, 8)}</td>
@@ -58,7 +58,7 @@ async function renderComprobantes(container) {
                   <td class="text-right font-mono">${formatCurrency(r.amount)}</td>
                   <td><span class="badge ${r.status}">${r.status}</span></td>
                   <td class="text-center">
-                    <button class="btn btn-sm btn-outline view-detail-btn" data-id="${r.id}">Ver</button>
+                    <button class="btn btn-sm btn-outline view-detail-btn" data-id="${r.id}">${__('receipts.view')}</button>
                   </td>
                 </tr>
               `).join('')}
@@ -70,7 +70,7 @@ async function renderComprobantes(container) {
       <div class="modal-overlay" id="receiptModal">
         <div class="modal">
           <div class="modal-header">
-            <h2 id="modalTitle">Detalle del comprobante</h2>
+            <h2 id="modalTitle">${__('receipts.detail_title')}</h2>
             <button class="modal-close" id="modalClose">&times;</button>
           </div>
           <div class="modal-body" id="modalBody">
@@ -101,7 +101,7 @@ async function renderComprobantes(container) {
       });
       // Update count
       const countEl = document.querySelector('.filter-bar span');
-      if (countEl) countEl.textContent = `${visible} de ${rows.length} comprobantes`;
+      if (countEl) countEl.textContent = `${visible} ${__('receipts.of')} ${rows.length} ${__('receipts.receipts')}`;
     }
 
     searchInput.addEventListener('input', filterTable);
@@ -117,7 +117,7 @@ async function renderComprobantes(container) {
       const receipt = receiptsList.find(r => r.id === receiptId);
       if (!receipt) return;
 
-      modalTitle.textContent = `Comprobante #${receipt.id.slice(0, 8)}`;
+      modalTitle.textContent = `${__('receipts.receipt_no')}${receipt.id.slice(0, 8)}`;
       modalBody.innerHTML = renderReceiptDetail(receipt);
       modalFooter.innerHTML = renderReceiptActions(receipt);
       modal.classList.add('active');
@@ -126,7 +126,7 @@ async function renderComprobantes(container) {
       modalFooter.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', async () => {
           btn.disabled = true;
-          btn.textContent = 'Procesando...';
+          btn.textContent = __('receipts.processing');
           const action = btn.dataset.action;
           const notesInput = document.getElementById('rejectionNotes');
           const notes = notesInput ? notesInput.value.trim() : '';
@@ -158,11 +158,11 @@ async function renderComprobantes(container) {
 
   } catch (err) {
     container.innerHTML = `
-      <h1 class="page-title">Comprobantes</h1>
-      <p class="page-subtitle">Todos los comprobantes fiscales de tu flotilla</p>
+      <h1 class="page-title">${__('receipts.title')}</h1>
+      <p class="page-subtitle">${__('receipts.subtitle')}</p>
       <div class="table-container" style="padding:40px;text-align:center;color:var(--danger);">
-        <p>Error al cargar: ${escapeHtml(err.message)}</p>
-        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">Reintentar</button>
+        <p>${__('error_loading')} ${escapeHtml(err.message)}</p>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">${__('retry')}</button>
       </div>
     `;
   }
@@ -179,8 +179,8 @@ function renderReceiptDetail(r) {
       <div>
         ${hasImage
           ? `<img src="${r.image_url}" alt="Comprobante" class="receipt-image" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-             <div class="receipt-image-placeholder" style="display:none;">No se pudo cargar la imagen</div>`
-          : `<div class="receipt-image-placeholder">Sin foto disponible</div>`
+             <div class="receipt-image-placeholder" style="display:none;">${__('receipts.image_error')}</div>`
+          : `<div class="receipt-image-placeholder">${__('receipts.no_image')}</div>`
         }
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
           <span class="badge ${r.status}">${r.status}</span>
@@ -188,41 +188,41 @@ function renderReceiptDetail(r) {
       </div>
       <div>
         <div class="form-group">
-          <label>Proveedor</label>
+          <label>${__('receipts.vendor')}</label>
           <div class="form-input" style="background:var(--bg);cursor:default;">${escapeHtml(r.vendor_name || '—')}</div>
         </div>
         <div class="form-group">
-          <label>Monto</label>
+          <label>${__('receipts.amount')}</label>
           <div class="form-input" style="background:var(--bg);cursor:default;font-weight:700;">${formatCurrency(r.amount)}</div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Fecha</label>
+            <label>${__('receipts.date')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">${formatDate(r.receipt_date)}</div>
           </div>
           <div class="form-group">
-            <label>Categoría</label>
+            <label>${__('receipts.category')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">${escapeHtml(r.category || '—')}</div>
           </div>
         </div>
         <div class="form-group">
-          <label>Empleado</label>
+          <label>${__('receipts.employee')}</label>
           <div class="form-input" style="background:var(--bg);cursor:default;">${escapeHtml(r.driver_name || '—')}</div>
         </div>
         <div class="form-group">
-          <label>Subido</label>
+          <label>${__('receipts.uploaded')}</label>
           <div class="form-input" style="background:var(--bg);cursor:default;">${formatDateTime(r.created_at)}</div>
         </div>
       </div>
     </div>
     ${r.status === 'rejected' || r.status === 'pending'
       ? `<div class="form-group" style="margin-top:16px;">
-          <label for="rejectionNotes">Notas</label>
-          <textarea class="form-textarea" id="rejectionNotes" placeholder="Agregar notas o motivo de rechazo...">${escapeHtml(r.notes || '')}</textarea>
+          <label for="rejectionNotes">${__('receipts.notes')}</label>
+          <textarea class="form-textarea" id="rejectionNotes" placeholder="${__('receipts.notes_placeholder')}">${escapeHtml(r.notes || '')}</textarea>
         </div>`
       : r.notes
         ? `<div class="form-group" style="margin-top:16px;">
-            <label>Notas</label>
+            <label>${__('receipts.notes')}</label>
             <div class="form-input" style="background:var(--bg);cursor:default;">${escapeHtml(r.notes)}</div>
           </div>`
         : ''
@@ -236,13 +236,13 @@ function renderReceiptDetail(r) {
 function renderReceiptActions(r) {
   const actions = [];
   if (r.status === 'pending') {
-    actions.push('<button class="btn btn-success" data-action="approved">✓ Aprobar</button>');
-    actions.push('<button class="btn btn-danger" data-action="rejected">✗ Rechazar</button>');
+    actions.push(`<button class="btn btn-success" data-action="approved">${ICON.check} ${__('receipts.approve')}</button>`);
+    actions.push(`<button class="btn btn-danger" data-action="rejected">${ICON.x} ${__('receipts.reject')}</button>`);
   } else if (r.status === 'approved') {
-    actions.push('<button class="btn btn-primary" data-action="paid">💰 Marcar como pagado</button>');
-    actions.push('<button class="btn btn-outline" data-action="rejected">✗ Rechazar</button>');
+    actions.push(`<button class="btn btn-primary" data-action="paid">${ICON.wallet} ${__('receipts.mark_paid')}</button>`);
+    actions.push(`<button class="btn btn-outline" data-action="rejected">${ICON.x} ${__('receipts.reject')}</button>`);
   }
-  actions.push('<button class="btn btn-outline" id="modalCloseBtn">Cerrar</button>');
+  actions.push(`<button class="btn btn-outline" id="modalCloseBtn">${__('receipts.close')}</button>`);
   return actions.join(' ');
 }
 
@@ -257,11 +257,14 @@ async function updateReceiptStatus(receiptId, newStatus, notes) {
       params: { admin_id: adminId },
       body: { status: newStatus, notes: notes || undefined },
     });
-    showToast(`Comprobante ${newStatus === 'approved' ? 'aprobado' : newStatus === 'rejected' ? 'rechazado' : 'marcado como pagado'} exitosamente`, 'success');
+    const msgKey = newStatus === 'approved' ? 'receipts.approved_msg'
+      : newStatus === 'rejected' ? 'receipts.rejected_msg'
+      : 'receipts.marked_paid';
+    showToast(`${__('receipts.comprobante')} ${__(msgKey)} ${__('success')}`, 'success');
     // Close modal and refresh the page
     document.getElementById('receiptModal').classList.remove('active');
     route();
   } catch (err) {
-    showToast(`Error: ${err.message}`, 'error');
+    showToast(`${__('error')} ${err.message}`, 'error');
   }
 }
