@@ -1,7 +1,7 @@
 """Receipts router — list, filter, approve, reject, and export receipts."""
 
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,6 +29,7 @@ class ReceiptOut(BaseModel):
     status: str
     notes: str | None = None
     created_at: str
+    paid_at: str | None = None
 
     class Config:
         from_attributes = True
@@ -43,9 +44,20 @@ class SummaryOut(BaseModel):
     total_pending: int
     total_approved: int
     total_paid: int
+    total_rejected: int
     pending_amount: float
     approved_amount: float
     paid_amount: float
+    rejected_amount: float
+
+
+class DriverSummaryOut(BaseModel):
+    driver_id: str
+    driver_name: str
+    approved_amount: float
+    paid_amount: float
+    pending_to_pay: float
+    receipt_count: int
 
 
 # --- Routes ---
@@ -77,14 +89,67 @@ async def get_summary(
     )
     paid_count, paid_amount = paid.one()
 
+    # Rejected
+    rejected = await db.execute(
+        select(func.count(), func.coalesce(func.sum(Receipt.amount), 0))
+        .where(Receipt.tenant_id == tenant_id, Receipt.status == "rejected")
+    )
+    rejected_count, rejected_amount = rejected.one()
+
     return SummaryOut(
         total_pending=pending_count,
         total_approved=approved_count,
         total_paid=paid_count,
+        total_rejected=rejected_count,
         pending_amount=float(pending_amount),
         approved_amount=float(approved_amount),
         paid_amount=float(paid_amount),
+        rejected_amount=float(rejected_amount),
     )
+
+
+@router.get("/summary/by-driver")
+async def get_driver_summary(
+    tenant_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Per-driver summary for the A Pagar page — returns approved/paid/pending-to-pay per driver."""
+    result = await db.execute(
+        select(Receipt)
+        .options(joinedload(Receipt.driver))
+        .where(Receipt.tenant_id == tenant_id)
+        .where(Receipt.status.in_(["approved", "paid"]))
+    )
+    receipts = result.scalars().all()
+
+    # Aggregate per driver
+    driver_map = {}
+    for r in receipts:
+        did = str(r.driver_id)
+        if did not in driver_map:
+            driver_map[did] = {
+                "driver_id": did,
+                "driver_name": r.driver.name if r.driver else "Sin nombre",
+                "approved_amount": 0.0,
+                "paid_amount": 0.0,
+                "receipt_count": 0,
+            }
+        d = driver_map[did]
+        amt = float(r.amount) if r.amount else 0.0
+        d["receipt_count"] += 1
+        if r.status == "approved":
+            d["approved_amount"] += amt
+        elif r.status == "paid":
+            d["paid_amount"] += amt
+
+    driver_list = list(driver_map.values())
+    for d in driver_list:
+        d["pending_to_pay"] = round(d["approved_amount"] - d["paid_amount"], 2)
+
+    # Sort by pending_to_pay descending
+    driver_list.sort(key=lambda x: x["pending_to_pay"], reverse=True)
+
+    return [DriverSummaryOut(**d) for d in driver_list]
 
 
 @router.get("")
@@ -136,6 +201,7 @@ async def list_receipts(
             status=r.status,
             notes=r.notes,
             created_at=r.created_at.isoformat() if r.created_at else "",
+            paid_at=r.paid_at.isoformat() if r.paid_at else None,
         )
         for r in receipts
     ]
@@ -160,9 +226,37 @@ async def update_receipt_status(
     receipt.approved_by = admin_id
 
     if update.status == "paid":
-        from datetime import datetime, timezone
         receipt.paid_at = datetime.now(timezone.utc)
 
     await db.commit()
 
     return {"message": f"Receipt {update.status}", "id": str(receipt_id)}
+
+
+@router.post("/batch-pay")
+async def batch_pay(
+    receipt_ids: list[uuid.UUID],
+    admin_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Mark multiple receipts as paid in a single transaction."""
+    result = await db.execute(
+        select(Receipt).where(Receipt.id.in_(receipt_ids))
+    )
+    receipts = result.scalars().all()
+
+    if not receipts:
+        raise HTTPException(status_code=404, detail="No receipts found")
+
+    now = datetime.now(timezone.utc)
+    paid_count = 0
+    for receipt in receipts:
+        if receipt.status == "approved":
+            receipt.status = "paid"
+            receipt.paid_at = now
+            receipt.approved_by = admin_id
+            paid_count += 1
+
+    await db.commit()
+
+    return {"message": f"{paid_count} receipts marked as paid", "count": paid_count}
