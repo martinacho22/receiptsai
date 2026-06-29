@@ -80,6 +80,7 @@ const TRANSLATIONS = {
   'receipts.no_receipts': { es: 'No hay comprobantes registrados', en: 'No receipts registered' },
   'receipts.of':          { es: 'de',                  en: 'of' },
   'receipts.receipts':    { es: 'comprobantes',        en: 'receipts' },
+  'receipts.comprobante': { es: 'Comprobante',         en: 'Receipt' },
   'receipts.detail_title':{ es: 'Detalle del comprobante', en: 'Receipt details' },
   'receipts.receipt_no':  { es: 'Comprobante #',       en: 'Receipt #' },
   'receipts.no_image':    { es: 'Sin foto disponible', en: 'No photo available' },
