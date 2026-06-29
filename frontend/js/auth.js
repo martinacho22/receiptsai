@@ -12,57 +12,83 @@ function renderAuthPage() {
   app.className = 'auth-page';
   app.innerHTML = `
     <div class="auth-card">
+      <div class="auth-lang-toggle" style="text-align:right;margin-bottom:8px;">
+        ${renderLangToggle()}
+      </div>
       <div class="logo">
         <img src="assets/logo.svg" alt="ReceiptsAI" onerror="this.style.display='none'">
         <h1>ReceiptsAI</h1>
       </div>
-      <h2>${isLogin ? 'Iniciar sesión' : 'Crear cuenta'}</h2>
-      <p class="subtitle">${isLogin ? 'Accede a tu panel de control' : 'Registra tu empresa para comenzar'}</p>
+      <h2>${isLogin ? __('auth.login_title') : __('auth.register_title')}</h2>
+      <p class="subtitle">${isLogin ? __('auth.login_sub') : __('auth.register_sub')}</p>
       <div class="auth-error" id="authError"></div>
       <form id="authForm">
         ${isLogin ? `
           <div class="form-group">
-            <label for="email">Correo electrónico</label>
-            <input type="email" id="email" class="form-input" placeholder="admin@empresa.com" required autocomplete="email">
+            <label for="email">${__('auth.email')}</label>
+            <input type="email" id="email" class="form-input" placeholder="${__('auth.email_placeholder')}" required autocomplete="email">
           </div>
           <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+            <label for="password">${__('auth.password')}</label>
+            <input type="password" id="password" class="form-input" placeholder="${__('auth.password_placeholder')}" required autocomplete="current-password">
           </div>
-          <button type="submit" class="btn btn-primary" id="authBtn">Iniciar sesión</button>
+          <button type="submit" class="btn btn-primary" id="authBtn">${__('auth.login_btn')}</button>
         ` : `
           <div class="form-group">
-            <label for="company">Nombre de la empresa</label>
-            <input type="text" id="company" class="form-input" placeholder="Mi Empresa S.A. de C.V." required>
+            <label for="company">${__('auth.company')}</label>
+            <input type="text" id="company" class="form-input" placeholder="${__('auth.company_placeholder')}" required>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="name">Nombre del administrador</label>
-              <input type="text" id="name" class="form-input" placeholder="Juan Pérez" required>
+              <label for="name">${__('auth.admin_name')}</label>
+              <input type="text" id="name" class="form-input" placeholder="${__('auth.admin_name_placeholder')}" required>
             </div>
             <div class="form-group">
-              <label for="phone">Teléfono</label>
-              <input type="tel" id="phone" class="form-input" placeholder="+521234567890" required>
+              <label for="phone">${__('auth.phone')}</label>
+              <input type="tel" id="phone" class="form-input" placeholder="${__('auth.phone_placeholder')}" required>
             </div>
           </div>
           <div class="form-group">
-            <label for="email">Correo electrónico</label>
-            <input type="email" id="email" class="form-input" placeholder="admin@empresa.com" required>
+            <label for="email">${__('auth.email')}</label>
+            <input type="email" id="email" class="form-input" placeholder="${__('auth.email_placeholder')}" required>
           </div>
           <div class="form-group">
-            <label for="password">Contraseña</label>
+            <label for="password">${__('auth.password')}</label>
             <input type="password" id="password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
           </div>
-          <button type="submit" class="btn btn-primary" id="authBtn">Crear cuenta</button>
+          <button type="submit" class="btn btn-primary" id="authBtn">${__('auth.register_btn')}</button>
         `}
       </form>
+      <div style="margin-top:12px;">
+        <button class="btn btn-outline" id="demoBtn" style="width:100%;font-size:0.85rem;">${__('auth.demo_btn')}</button>
+      </div>
       <div class="auth-link">
         ${isLogin
-          ? '¿No tienes cuenta? <a href="#register">Regístrate</a>'
-          : '¿Ya tienes cuenta? <a href="#login">Iniciar sesión</a>'}
+          ? `${__('auth.no_account')} <a href="#register">${__('auth.register_link')}</a>`
+          : `${__('auth.has_account')} <a href="#login">${__('auth.login_link')}</a>`}
       </div>
     </div>
   `;
+
+  // Initialize language toggle
+  initLangToggle();
+
+  // Demo login button
+  document.getElementById('demoBtn').addEventListener('click', async () => {
+    const errorEl = document.getElementById('authError');
+    errorEl.classList.remove('show');
+    try {
+      const data = await apiCall('/auth/demo-login', {
+        method: 'POST',
+        auth: false,
+      });
+      storeLogin(data);
+      navigateTo('dashboard');
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.add('show');
+    }
+  });
 
   // Form submit
   document.getElementById('authForm').addEventListener('submit', async (e) => {
@@ -71,7 +97,7 @@ function renderAuthPage() {
     const btn = document.getElementById('authBtn');
     errorEl.classList.remove('show');
     btn.disabled = true;
-    btn.textContent = isLogin ? 'Entrando...' : 'Creando cuenta...';
+    btn.textContent = isLogin ? __('auth.login_loading') : __('auth.register_loading');
 
     try {
       let data;
@@ -98,7 +124,6 @@ function renderAuthPage() {
         });
       }
 
-      // Both login and register now return AuthResponse with access_token + user
       storeLogin(data);
       navigateTo('dashboard');
     } catch (err) {
@@ -108,7 +133,7 @@ function renderAuthPage() {
       errorEl.classList.add('show');
     } finally {
       btn.disabled = false;
-      btn.textContent = isLogin ? 'Iniciar sesión' : 'Crear cuenta';
+      btn.textContent = isLogin ? __('auth.login_btn') : __('auth.register_btn');
     }
   });
 }
