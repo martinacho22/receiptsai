@@ -1,4 +1,4 @@
-"""Authentication router — login, register, token refresh."""
+"""Authentication router — login, register, demo login, token refresh."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -9,6 +9,7 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from app.models.subscription import Subscription
 from app.utils.auth import hash_password, verify_password, create_access_token
+from app.services.demo import seed_demo_data
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -62,7 +63,7 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
         currency="MXN",
     )
     db.add(tenant)
-    await db.flush()  # get tenant.id
+    await db.flush()
 
     # Create subscription (free trial)
     sub = Subscription(
@@ -85,7 +86,7 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     db.add(admin)
     await db.flush()
 
-    # Generate JWT so user is logged in immediately after registration
+    # Generate JWT so user is logged in immediately
     token = create_access_token(
         user_id=admin.id,
         tenant_id=admin.tenant_id,
@@ -125,7 +126,6 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
         role=user.role,
     )
 
-    # Fetch tenant name for response
     tenant_result = await db.execute(
         select(Tenant).where(Tenant.id == user.tenant_id)
     )
@@ -138,5 +138,42 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
             tenant_id=str(user.tenant_id),
             company_name=tenant.name if tenant else "",
             role=user.role,
+        ),
+    )
+
+
+@router.post("/demo-login", operation_id="demo_login")
+async def demo_login(db: AsyncSession = Depends(get_db)):
+    """One-click demo login. Seeds demo data on first call, logs in on every call.
+
+    Creates a demo tenant ("Concretera del Bajío") with an admin user,
+    five drivers, and eight sample fuel receipts. Idempotent — subsequent
+    calls just return a fresh JWT for the same demo admin.
+    """
+    from app.utils.demo import DEMO_TENANT_NAME
+
+    admin = await seed_demo_data(db)
+
+    if admin is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create or find demo user",
+        )
+
+    token = create_access_token(
+        user_id=admin.id,
+        tenant_id=admin.tenant_id,
+        role=admin.role,
+    )
+
+    await db.commit()
+
+    return AuthResponse(
+        access_token=token,
+        user=UserInfo(
+            id=str(admin.id),
+            tenant_id=str(admin.tenant_id),
+            company_name=DEMO_TENANT_NAME,
+            role=admin.role,
         ),
     )
