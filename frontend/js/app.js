@@ -5,7 +5,8 @@
  * and auth guard. This is the entry point after all modules load.
  */
 
-const PAGES = ['dashboard', 'comprobantes', 'conductores', 'configuracion'];
+const PAGES = ['dashboard', 'comprobantes', 'conductores', 'configuracion', 'pagar'];
+const ADMIN_PAGES = ['conductores', 'configuracion'];
 let currentPage = null;
 
 /**
@@ -23,12 +24,28 @@ function navigateTo(page) {
  * Render the sidebar navigation.
  */
 function renderSidebar(current) {
+  const user = getStoredUser();
+  const role = user?.role || 'admin';
+
+  const navItems = [
   const navItems = [
     { id: 'dashboard',     label: __('nav.dashboard'),     icon: 'dashboard' },
+    { id: 'pagar',         label: __('nav.a_pagar'),       icon: 'wallet' },
     { id: 'comprobantes',  label: __('nav.comprobantes'),  icon: 'receipt' },
-    { id: 'conductores',   label: __('nav.conductores'),   icon: 'users' },
-    { id: 'configuracion', label: __('nav.configuracion'), icon: 'settings' },
   ];
+
+  // Only admin/boss can see Conductores and Configuración
+  if (role === 'admin') {
+    navItems.push({ id: 'conductores',   label: __('nav.conductores'),   icon: 'users' });
+    navItems.push({ id: 'configuracion', label: __('nav.configuracion'), icon: 'settings' });
+  }
+  ];
+
+  // Only admin/boss can see Conductores and Configuración
+  if (role === 'admin') {
+    navItems.push({ id: 'conductores', label: 'Conductores', icon: '👤' });
+    navItems.push({ id: 'configuracion', label: 'Configuración', icon: '⚙️' });
+  }
 
   return `
     <div class="sidebar">
@@ -47,6 +64,7 @@ function renderSidebar(current) {
       <div class="sidebar-footer">
         <div style="font-size:0.8rem;color:var(--text-muted);">${getStoredUser()?.role || ''}</div>
         <button class="btn btn-sm btn-outline" id="logoutBtn">${__('nav.salir')}</button>
+
       </div>
     </div>
   `;
@@ -122,8 +140,11 @@ function route() {
     window.location.hash = '#dashboard';
   }
 
-  // Validate page
-  if (!PAGES.includes(hash)) {
+  const user = getStoredUser();
+  const role = user?.role || 'admin';
+
+  // Validate page — drivers cannot access admin pages
+  if (!PAGES.includes(hash) || (role !== 'admin' && ADMIN_PAGES.includes(hash))) {
     hash = 'dashboard';
     window.location.hash = '#dashboard';
   }
@@ -135,6 +156,9 @@ function route() {
   switch (hash) {
     case 'dashboard':
       renderDashboard(container);
+      break;
+    case 'pagar':
+      renderPagar(container);
       break;
     case 'comprobantes':
       renderComprobantes(container);
@@ -157,6 +181,7 @@ function getPageTitle(page) {
     comprobantes: __('receipts.title'),
     conductores: __('drivers.title'),
     configuracion: __('settings.title'),
+
   };
   return titles[page] || 'ReceiptsAI';
 }

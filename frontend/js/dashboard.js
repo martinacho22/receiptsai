@@ -10,7 +10,7 @@ async function renderDashboard(container) {
 
   try {
     // Fetch summary and receipts in parallel; if either fails, show zeros gracefully
-    let summary = { total_pending: 0, total_approved: 0, total_paid: 0, pending_amount: 0, approved_amount: 0, paid_amount: 0 };
+    let summary = { total_pending: 0, total_approved: 0, total_paid: 0, total_rejected: 0, pending_amount: 0, approved_amount: 0, paid_amount: 0, rejected_amount: 0 };
     let receipts = [];
 
     try {
@@ -38,6 +38,7 @@ async function renderDashboard(container) {
           pending: 0,
           approved: 0,
           paid: 0,
+          rejected: 0,
           count: 0,
         };
       }
@@ -47,6 +48,7 @@ async function renderDashboard(container) {
       if (r.status === 'pending') d.pending += (r.amount || 0);
       else if (r.status === 'approved') d.approved += (r.amount || 0);
       else if (r.status === 'paid') d.paid += (r.amount || 0);
+      else if (r.status === 'rejected') d.rejected += (r.amount || 0);
     });
 
     const driverArray = Object.values(driverTotals);
@@ -73,6 +75,11 @@ async function renderDashboard(container) {
           <div class="kpi-sub">${formatCurrency(summary.paid_amount)}</div>
         </div>
         <div class="kpi-card">
+          <div class="kpi-label">Rechazados</div>
+          <div class="kpi-value" style="color:var(--danger)">${summary.total_rejected || 0}</div>
+          <div class="kpi-sub">${formatCurrency(summary.rejected_amount)}</div>
+        </div>
+        <div class="kpi-card">
           <div class="kpi-label">${__('dashboard.active_drivers')}</div>
           <div class="kpi-value" style="color:var(--text)">${driverArray.length || '—'}</div>
           <div class="kpi-sub">${totalCount} ${__('dashboard.total_receipts')}</div>
@@ -84,16 +91,17 @@ async function renderDashboard(container) {
         <table>
           <thead>
             <tr>
-              <th>${__('dashboard.employee')}</th>
-              <th>${__('dashboard.receipts')}</th>
-              <th class="text-right">${__('dashboard.total')}</th>
-              <th class="text-right">${__('dashboard.pending_amount')}</th>
-              <th class="text-right">${__('dashboard.approved_amount')}</th>
-              <th class="text-right">${__('dashboard.paid_amount')}</th>
+              <th>${__("dashboard.employee")}</th>
+              <th>${__("dashboard.receipts")}</th>
+              <th class="text-right">${__("dashboard.total")}</th>
+              <th class="text-right">${__("dashboard.pending_amount")}</th>
+              <th class="text-right">${__("dashboard.approved_amount")}</th>
+              <th class="text-right">${__("dashboard.paid_amount")}</th>
+              <th class="text-right">Rechazado</th>
             </tr>
           </thead>
           <tbody>
-            ${driverArray.length === 0 ? `<tr><td colspan="6" class="text-center" style="color:var(--text-muted);padding:32px;">${__('dashboard.no_data')}</td></tr>` : ''}
+            ${driverArray.length === 0 ? `<tr><td colspan="7" class="text-center" style="color:var(--text-muted);padding:32px;">${__("dashboard.no_data")}</td></tr>` : ''}
             ${driverArray.map(d => `
               <tr>
                 <td class="font-semibold">${escapeHtml(d.driver_name)}</td>
@@ -102,6 +110,7 @@ async function renderDashboard(container) {
                 <td class="text-right font-mono">${formatCurrency(d.pending)}</td>
                 <td class="text-right font-mono">${formatCurrency(d.approved)}</td>
                 <td class="text-right font-mono">${formatCurrency(d.paid)}</td>
+                <td class="text-right font-mono">${formatCurrency(d.rejected)}</td>
               </tr>
             `).join('')}
           </tbody>

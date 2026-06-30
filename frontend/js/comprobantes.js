@@ -26,6 +26,7 @@ async function renderComprobantes(container) {
           <option value="paid">${__('receipts.paid')}</option>
           <option value="rejected">${__('receipts.rejected')}</option>
         </select>
+        <button class="btn btn-sm btn-outline" id="exportCsvBtn">📥 Exportar CSV</button>
         <span style="font-size:0.85rem;color:var(--text-muted);margin-left:auto;">
           ${receiptsList.length} ${__('receipts.receipts')}
         </span>
@@ -106,6 +107,49 @@ async function renderComprobantes(container) {
 
     searchInput.addEventListener('input', filterTable);
     statusFilter.addEventListener('change', filterTable);
+
+    // --- Export CSV ---
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      const rows = document.querySelectorAll('.receipt-row');
+      const visibleRows = [];
+      rows.forEach(row => {
+        if (row.style.display !== 'none') {
+          visibleRows.push(row);
+        }
+      });
+
+      // Get full receipt data for visible rows
+      const visibleIds = new Set();
+      visibleRows.forEach(row => visibleIds.add(row.dataset.id));
+      const visibleReceipts = receiptsList.filter(r => visibleIds.has(r.id));
+
+      // Build CSV
+      const headers = ['Folio', 'Empleado', 'Proveedor', 'Fecha', 'Categoria', 'Monto', 'Estado', 'Pagado el'];
+      const csvRows = [headers.join(',')];
+
+      visibleReceipts.forEach(r => {
+        csvRows.push([
+          r.id.slice(0, 8),
+          `"${(r.driver_name || '').replace(/"/g, '""')}"`,
+          `"${(r.vendor_name || '').replace(/"/g, '""')}"`,
+          r.receipt_date || '',
+          `"${(r.category || '').replace(/"/g, '""')}"`,
+          r.amount || '',
+          r.status,
+          r.paid_at || '',
+        ].join(','));
+      });
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `comprobantes_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('📥 CSV exportado', 'success');
+    });
 
     // --- View detail modal ---
     const modal = document.getElementById('receiptModal');
@@ -213,6 +257,13 @@ function renderReceiptDetail(r) {
           <label>${__('receipts.uploaded')}</label>
           <div class="form-input" style="background:var(--bg);cursor:default;">${formatDateTime(r.created_at)}</div>
         </div>
+        ${r.status === 'paid' && r.paid_at
+          ? `<div class="form-group">
+              <label>Pagado el</label>
+              <div class="form-input" style="background:var(--bg);cursor:default;color:var(--success);font-weight:600;">${formatDateTime(r.paid_at)}</div>
+            </div>`
+          : ''
+        }
       </div>
     </div>
     ${r.status === 'rejected' || r.status === 'pending'
@@ -267,4 +318,11 @@ async function updateReceiptStatus(receiptId, newStatus, notes) {
   } catch (err) {
     showToast(`${__('error')} ${err.message}`, 'error');
   }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
