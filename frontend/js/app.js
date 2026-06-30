@@ -28,25 +28,16 @@ function renderSidebar(current) {
   const role = user?.role || 'admin';
 
   const navItems = [
-  const navItems = [
-    { id: 'dashboard',     label: __('nav.dashboard'),     icon: 'dashboard' },
-    { id: 'pagar',         label: __('nav.a_pagar'),       icon: 'wallet' },
-    { id: 'comprobantes',  label: __('nav.comprobantes'),  icon: 'receipt' },
+    { id: "dashboard",     label: __("nav.dashboard"),     icon: "dashboard" },
+    { id: "pagar",         label: __("nav.a_pagar"),       icon: "wallet" },
+    { id: "comprobantes",  label: __("nav.comprobantes"),  icon: "receipt" },
   ];
 
   // Only admin/boss can see Conductores and Configuración
-  if (role === 'admin') {
-    navItems.push({ id: 'conductores',   label: __('nav.conductores'),   icon: 'users' });
-    navItems.push({ id: 'configuracion', label: __('nav.configuracion'), icon: 'settings' });
+  if (role === "admin") {
+    navItems.push({ id: "conductores",   label: __("nav.conductores"),   icon: "users" });
+    navItems.push({ id: "configuracion", label: __("nav.configuracion"), icon: "settings" });
   }
-  ];
-
-  // Only admin/boss can see Conductores and Configuración
-  if (role === 'admin') {
-    navItems.push({ id: 'conductores', label: 'Conductores', icon: '👤' });
-    navItems.push({ id: 'configuracion', label: 'Configuración', icon: '⚙️' });
-  }
-
   return `
     <div class="sidebar">
       <div class="sidebar-logo">
@@ -181,6 +172,7 @@ function getPageTitle(page) {
     comprobantes: __('receipts.title'),
     conductores: __('drivers.title'),
     configuracion: __('settings.title'),
+    pagar: __('pay.title'),
 
   };
   return titles[page] || 'ReceiptsAI';
