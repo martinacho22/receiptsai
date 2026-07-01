@@ -88,10 +88,10 @@ async function renderConfiguracion(container) {
       <!-- Pricing Plans -->
       <h2 style="font-size:1.1rem;margin:32px 0 16px;">${__('settings.plans')}</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;">
-        ${renderPlanCard('Básico', '$400', 'Hasta 100 comprobantes/mes', 'Hasta 5 conductores', 'Soporte por correo', false, usage.plan)}
-        ${renderPlanCard('Profesional', '$1,000', 'Hasta 500 comprobantes/mes', 'Hasta 20 conductores', 'Soporte prioritario', true, usage.plan)}
-        ${renderPlanCard('Empresarial', '$2,500', 'Hasta 2,000 comprobantes/mes', 'Conductores ilimitados', 'Soporte 24/7', false, usage.plan)}
-        ${renderPlanCard('Corporativo', '$5,000', 'Comprobantes ilimitados', 'Conductores ilimitados', 'Soporte dedicado + API', false, usage.plan)}
+        ${renderPlanCard(__('plan.basic'), '$400', __('plan.basic.feature1'), __('plan.basic.feature2'), __('plan.basic.feature3'), false, usage.plan)}
+        ${renderPlanCard(__('plan.professional'), '$1,000', __('plan.pro.feature1'), __('plan.pro.feature2'), __('plan.pro.feature3'), true, usage.plan)}
+        ${renderPlanCard(__('plan.enterprise'), '$2,500', __('plan.enterprise.feature1'), __('plan.enterprise.feature2'), __('plan.enterprise.feature3'), false, usage.plan)}
+        ${renderPlanCard(__('plan.corporate'), '$5,000', __('plan.corporate.feature1'), __('plan.corporate.feature2'), __('plan.corporate.feature3'), false, usage.plan)}
       </div>
     `;
   } catch (err) {
