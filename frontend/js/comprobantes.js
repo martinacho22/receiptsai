@@ -26,7 +26,7 @@ async function renderComprobantes(container) {
           <option value="paid">${__('receipts.paid')}</option>
           <option value="rejected">${__('receipts.rejected')}</option>
         </select>
-        <button class="btn btn-sm btn-outline" id="exportCsvBtn">📥 Exportar CSV</button>
+        <button class="btn btn-sm btn-outline" id="exportCsvBtn">${__('receipts.export_csv')}</button>
         <span style="font-size:0.85rem;color:var(--text-muted);margin-left:auto;">
           ${receiptsList.length} ${__('receipts.receipts')}
         </span>
@@ -123,8 +123,17 @@ async function renderComprobantes(container) {
       visibleRows.forEach(row => visibleIds.add(row.dataset.id));
       const visibleReceipts = receiptsList.filter(r => visibleIds.has(r.id));
 
-      // Build CSV
-      const headers = ['Folio', 'Empleado', 'Proveedor', 'Fecha', 'Categoria', 'Monto', 'Estado', 'Pagado el'];
+      // Build CSV using translatable headers
+      const headers = [
+        __('receipts.folio'),
+        __('receipts.employee'),
+        __('receipts.vendor'),
+        __('receipts.date'),
+        __('receipts.category'),
+        __('receipts.amount'),
+        __('receipts.status'),
+        __('receipts.paid_on'),
+      ];
       const csvRows = [headers.join(',')];
 
       visibleReceipts.forEach(r => {
@@ -145,10 +154,10 @@ async function renderComprobantes(container) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `comprobantes_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `${__('receipts.receipts')}_${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
       URL.revokeObjectURL(url);
-      showToast('📥 CSV exportado', 'success');
+      showToast(__('receipts.csv_exported'), 'success');
     });
 
     // --- View detail modal ---
@@ -259,7 +268,7 @@ function renderReceiptDetail(r) {
         </div>
         ${r.status === 'paid' && r.paid_at
           ? `<div class="form-group">
-              <label>Pagado el</label>
+              <label>${__('receipts.paid_on')}</label>
               <div class="form-input" style="background:var(--bg);cursor:default;color:var(--success);font-weight:600;">${formatDateTime(r.paid_at)}</div>
             </div>`
           : ''
