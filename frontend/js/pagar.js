@@ -7,7 +7,7 @@
  */
 
 async function renderPagar(container) {
-  container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando sección de pagos...</div>';
+  container.innerHTML = `<div class="loading"><div class="spinner"></div>${__('pay.loading')}</div>`;
 
   try {
     // Fetch driver summary and paid receipts in parallel
@@ -32,32 +32,32 @@ async function renderPagar(container) {
     const driversToPay = drivers.filter(d => d.pending_to_pay > 0);
 
     container.innerHTML = `
-      <h1 class="page-title">A Pagar</h1>
-      <p class="page-subtitle">Comprobantes aprobados listos para liquidar</p>
+      <h1 class="page-title">${__('pay.title')}</h1>
+      <p class="page-subtitle">${__('pay.subtitle_alt')}</p>
 
       <div class="alert alert-info" style="background:#e0f2f1;border:1px solid #b2dfdb;border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:8px;font-size:0.9rem;color:#095b5a;">
         <span style="font-size:1.2rem;">ℹ️</span>
-        <span><strong>${driversToPay.length}</strong> empleado${driversToPay.length !== 1 ? 's' : ''} con <strong>${formatCurrency(totalPendingToPay)}</strong> pendiente de pago</span>
+        <span>${__('pay.employee_count', { count: driversToPay.length, amount: formatCurrency(totalPendingToPay) })}</span>
       </div>
 
       <div class="table-container" style="margin-bottom:24px;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 16px 0;">
-          <h2 style="font-size:1.1rem;font-weight:700;">Pendientes de pago</h2>
-          <input type="text" class="form-input" id="pagarSearch" placeholder="Buscar empleado..." style="max-width:240px;padding:8px 12px;" />
+          <h2 style="font-size:1.1rem;font-weight:700;">${__('pay.pending_payment')}</h2>
+          <input type="text" class="form-input" id="pagarSearch" placeholder="${__('pay.search_employee')}" style="max-width:240px;padding:8px 12px;" />
         </div>
         <table>
           <thead>
             <tr>
-              <th>Empleado</th>
-              <th class="text-right">Aprobado</th>
-              <th class="text-right">Pagado</th>
-              <th class="text-right">Pendiente de pago</th>
-              <th class="text-center">Acción</th>
+              <th>${__('pay.employee_header')}</th>
+              <th class="text-right">${__('pay.approved_header')}</th>
+              <th class="text-right">${__('pay.paid_header')}</th>
+              <th class="text-right">${__('pay.pending_header')}</th>
+              <th class="text-center">${__('pay.action_header')}</th>
             </tr>
           </thead>
           <tbody id="pagarBody">
             ${drivers.length === 0
-              ? '<tr><td colspan="5" class="text-center" style="color:var(--text-muted);padding:32px;">No hay comprobantes aprobados pendientes de pago</td></tr>'
+              ? `<tr><td colspan="5" class="text-center" style="color:var(--text-muted);padding:32px;">${__('pay.no_pending_approved')}</td></tr>`
               : drivers.map(d => `
                 <tr class="pagar-row" data-name="${escapeHtml(d.driver_name).toLowerCase()}">
                   <td class="font-semibold">${escapeHtml(d.driver_name)}</td>
@@ -68,7 +68,7 @@ async function renderPagar(container) {
                   </td>
                   <td class="text-center">
                     <button class="btn btn-sm btn-success pay-driver-btn" data-driver-id="${d.driver_id}" data-driver-name="${escapeHtml(d.driver_name)}" ${d.pending_to_pay <= 0 ? 'disabled' : ''}>
-                      💰 Pagar
+                      ${__('pay.pay_btn')}
                     </button>
                   </td>
                 </tr>
@@ -79,20 +79,20 @@ async function renderPagar(container) {
 
       <div class="table-container">
         <div style="padding:16px 16px 0;">
-          <h2 style="font-size:1.1rem;font-weight:700;">Historial de pagos</h2>
+          <h2 style="font-size:1.1rem;font-weight:700;">${__('pay.payment_history')}</h2>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Empleado</th>
-              <th>Monto</th>
-              <th>Pagado el</th>
-              <th>Comprobante</th>
+              <th>${__('pay.employee_header')}</th>
+              <th>${__('pay.amount_header')}</th>
+              <th>${__('pay.paid_on_header')}</th>
+              <th>${__('pay.receipt_header')}</th>
             </tr>
           </thead>
           <tbody>
             ${paidReceipts.length === 0
-              ? '<tr><td colspan="4" class="text-center" style="color:var(--text-muted);padding:32px;">Aún no hay pagos registrados</td></tr>'
+              ? `<tr><td colspan="4" class="text-center" style="color:var(--text-muted);padding:32px;">${__('pay.no_payments_yet')}</td></tr>`
               : paidReceipts.map(r => `
                 <tr>
                   <td class="font-semibold">${escapeHtml(r.driver_name || '—')}</td>
@@ -123,10 +123,10 @@ async function renderPagar(container) {
         const driverId = btn.dataset.driverId;
         const driverName = btn.dataset.driverName;
 
-        if (!confirm(`¿Confirmas que deseas pagar todos los comprobantes aprobados de ${driverName}?`)) return;
+        if (!confirm(__('pay.confirm_pay', { name: driverName }))) return;
 
         btn.disabled = true;
-        btn.textContent = 'Procesando...';
+        btn.textContent = __('pay.processing');
 
         try {
           // Get all approved receipts for this driver
@@ -135,9 +135,9 @@ async function renderPagar(container) {
           });
 
           if (!approvedReceipts || approvedReceipts.length === 0) {
-            showToast(`${escapeHtml(driverName)} no tiene comprobantes aprobados pendientes`, 'info');
+            showToast(__('pay.no_approved_for', { name: driverName }), 'info');
             btn.disabled = false;
-            btn.innerHTML = '💰 Pagar';
+            btn.innerHTML = __('pay.pay_btn');
             return;
           }
 
@@ -150,25 +150,25 @@ async function renderPagar(container) {
             params: { admin_id: adminId },
           });
 
-          showToast(`✅ Pago registrado — ${receiptIds.length} comprobante${receiptIds.length !== 1 ? 's' : ''} de ${escapeHtml(driverName)}`, 'success');
+          showToast(__('pay.paid_success', { count: receiptIds.length, name: driverName }), 'success');
 
           // Refresh the page to reflect updated state
           route();
         } catch (err) {
-          showToast(`Error al procesar pago: ${err.message}`, 'error');
+          showToast(__('pay.pay_error', { message: err.message }), 'error');
           btn.disabled = false;
-          btn.innerHTML = '💰 Pagar';
+          btn.innerHTML = __('pay.pay_btn');
         }
       });
     });
 
   } catch (err) {
     container.innerHTML = `
-      <h1 class="page-title">A Pagar</h1>
-      <p class="page-subtitle">Comprobantes aprobados listos para liquidar</p>
+      <h1 class="page-title">${__('pay.title')}</h1>
+      <p class="page-subtitle">${__('pay.subtitle_alt')}</p>
       <div class="table-container" style="padding:40px;text-align:center;color:var(--danger);">
-        <p>Error al cargar: ${escapeHtml(err.message)}</p>
-        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">Reintentar</button>
+        <p>${__('error_loading')} ${escapeHtml(err.message)}</p>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="route()">${__('retry')}</button>
       </div>
     `;
   }
