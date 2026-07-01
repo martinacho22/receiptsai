@@ -54,7 +54,7 @@ function renderAuthPage() {
           </div>
           <div class="form-group">
             <label for="password">${__('auth.password')}</label>
-            <input type="password" id="password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+            <input type="password" id="password" class="form-input" placeholder="${__('auth.password_minlength')}" required minlength="8">
           </div>
           <button type="submit" class="btn btn-primary" id="authBtn">${__('auth.register_btn')}</button>
         `}
