@@ -200,7 +200,9 @@ function showToast(message, type = 'info') {
  */
 function formatCurrency(amount) {
   if (amount === null || amount === undefined) return '$0.00';
-  return '$' + parseFloat(amount).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const lang = typeof getLang === 'function' ? getLang() : 'es';
+  const locale = lang === 'en' ? 'en-US' : 'es-MX';
+  return parseFloat(amount).toLocaleString(locale, { style: 'currency', currency: lang === 'en' ? 'USD' : 'MXN', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 /**
@@ -209,7 +211,8 @@ function formatCurrency(amount) {
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
-  return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' });
+  const lang = typeof getLang === 'function' ? getLang() : 'es';
+  return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-MX', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 /**
@@ -218,7 +221,8 @@ function formatDate(dateStr) {
 function formatDateTime(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
-  return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const lang = typeof getLang === 'function' ? getLang() : 'es';
+  return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-MX', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 // --- Initialize ---
