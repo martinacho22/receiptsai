@@ -41,6 +41,7 @@ const TRANSLATIONS = {
   'auth.register_link':   { es: 'Regístrate',           en: 'Sign up' },
   'auth.login_link':      { es: 'Iniciar sesión',       en: 'Log in' },
   'auth.demo_btn':        { es: 'Demo — Probar con datos de ejemplo', en: 'Demo — Try with sample data' },
+  'auth.password_minlength': { es: 'Mínimo 8 caracteres', en: 'Minimum 8 characters' },
 
   /* ── Dashboard ── */
   'dashboard.title':      { es: 'Dashboard',    en: 'Dashboard' },
@@ -48,16 +49,19 @@ const TRANSLATIONS = {
   'dashboard.pending':    { es: 'Pendientes',           en: 'Pending' },
   'dashboard.approved':   { es: 'Aprobados',           en: 'Approved' },
   'dashboard.paid':       { es: 'Pagados',             en: 'Paid' },
+  'dashboard.rejected':   { es: 'Rechazados',          en: 'Rejected' },
   'dashboard.active_drivers': { es: 'Conductores activos', en: 'Active drivers' },
   'dashboard.total':      { es: 'Total',               en: 'Total' },
   'dashboard.pending_amount': { es: 'Pendiente',       en: 'Pending' },
   'dashboard.approved_amount': { es: 'Aprobado',       en: 'Approved' },
   'dashboard.paid_amount':    { es: 'Pagado',          en: 'Paid' },
+  'dashboard.rejected_amount':{ es: 'Rechazado',       en: 'Rejected' },
   'dashboard.employee':   { es: 'Empleado',            en: 'Employee' },
   'dashboard.receipts':   { es: 'Comprobantes',        en: 'Receipts' },
   'dashboard.employee_summary': { es: 'Resumen por empleado', en: 'Summary by employee' },
   'dashboard.no_data':    { es: 'No hay datos de conductores — los comprobantes aparecerán aquí cuando los empleados envíen recibos', en: 'No driver data yet — receipts will appear here when employees submit them' },
   'dashboard.total_receipts': { es: 'comprobantes totales', en: 'total receipts' },
+  'driver.unnamed':       { es: 'Sin nombre',           en: 'Unnamed' },
 
   /* ── Comprobantes (Receipts) ── */
   'receipts.title':       { es: 'Comprobantes',        en: 'Receipts' },
@@ -96,6 +100,9 @@ const TRANSLATIONS = {
   'receipts.approved_msg':{ es: 'aprobado',            en: 'approved' },
   'receipts.rejected_msg':{ es: 'rechazado',           en: 'rejected' },
   'receipts.marked_paid': { es: 'marcado como pagado', en: 'marked as paid' },
+  'receipts.export_csv':  { es: '📥 Exportar CSV',     en: '📥 Export CSV' },
+  'receipts.csv_exported':{ es: '📥 CSV exportado',    en: '📥 CSV exported' },
+  'receipts.paid_on':     { es: 'Pagado el',           en: 'Paid on' },
 
   /* ── Conductores (Drivers) ── */
   'drivers.title':        { es: 'Conductores',         en: 'Drivers' },
@@ -131,6 +138,7 @@ const TRANSLATIONS = {
   /* ── Pagar (Payments) ── */
   'pay.title':            { es: 'A Pagar',             en: 'To Pay' },
   'pay.subtitle':         { es: 'Comprobantes pendientes de pago por empleado', en: 'Pending payments by employee' },
+  'pay.subtitle_alt':     { es: 'Comprobantes aprobados listos para liquidar', en: 'Approved receipts ready to pay' },
   'pay.total_pending':    { es: 'Total pendiente',     en: 'Total pending' },
   'pay.pay':              { es: 'Pagar',               en: 'Pay' },
   'pay.pay_all':          { es: 'Pagar todo',          en: 'Pay all' },
@@ -141,6 +149,27 @@ const TRANSLATIONS = {
   'pay.count':            { es: 'Comprobantes',        en: 'Receipts' },
   'pay.total':            { es: 'Total',               en: 'Total' },
   'pay.action':           { es: 'Acción',              en: 'Action' },
+  'pay.loading':          { es: 'Cargando sección de pagos...', en: 'Loading payments section…' },
+  'pay.pending_payment':  { es: 'Pendientes de pago',  en: 'Pending payment' },
+  'pay.search_employee':  { es: 'Buscar empleado...',  en: 'Search employee…' },
+  'pay.approved_header':  { es: 'Aprobado',            en: 'Approved' },
+  'pay.paid_header':      { es: 'Pagado',              en: 'Paid' },
+  'pay.pending_header':   { es: 'Pendiente de pago',   en: 'Pending payment' },
+  'pay.action_header':    { es: 'Acción',              en: 'Action' },
+  'pay.no_pending_approved': { es: 'No hay comprobantes aprobados pendientes de pago', en: 'No approved receipts pending payment' },
+  'pay.pay_btn':          { es: '💰 Pagar',            en: '💰 Pay' },
+  'pay.payment_history':  { es: 'Historial de pagos',  en: 'Payment history' },
+  'pay.employee_header':  { es: 'Empleado',            en: 'Employee' },
+  'pay.amount_header':    { es: 'Monto',               en: 'Amount' },
+  'pay.paid_on_header':   { es: 'Pagado el',           en: 'Paid on' },
+  'pay.receipt_header':   { es: 'Comprobante',         en: 'Receipt' },
+  'pay.no_payments_yet':  { es: 'Aún no hay pagos registrados', en: 'No payments recorded yet' },
+  'pay.confirm_pay':      { es: '¿Confirmas que deseas pagar todos los comprobantes aprobados de {name}?', en: 'Confirm you want to pay all approved receipts for {name}?' },
+  'pay.processing':       { es: 'Procesando...',       en: 'Processing…' },
+  'pay.pay_error':        { es: 'Error al procesar pago: {message}', en: 'Error processing payment: {message}' },
+  'pay.paid_success':     { es: '✅ Pago registrado — {count} comprobante(s) de {name}', en: '✅ Payment recorded — {count} receipt(s) for {name}' },
+  'pay.no_approved_for':  { es: '{name} no tiene comprobantes aprobados pendientes', en: '{name} has no approved receipts pending' },
+  'pay.employee_count':   { es: '{count} empleado(s) con {amount} pendiente de pago', en: '{count} employee(s) with {amount} pending payment' },
 
   /* ── Configuración (Settings) ── */
   'settings.title':       { es: 'Configuración',       en: 'Settings' },
@@ -162,6 +191,23 @@ const TRANSLATIONS = {
   'settings.coming_soon': { es: 'Próximamente',        en: 'Coming soon' },
   'settings.active':      { es: 'Activo',              en: 'Active' },
   'settings.trial':       { es: 'Prueba',              en: 'Trial' },
+  /* Plan names */
+  'plan.basic':           { es: 'Básico',              en: 'Basic' },
+  'plan.professional':    { es: 'Profesional',         en: 'Professional' },
+  'plan.enterprise':      { es: 'Empresarial',         en: 'Enterprise' },
+  'plan.corporate':       { es: 'Corporativo',         en: 'Corporate' },
+  'plan.basic.feature1':  { es: 'Hasta 100 comprobantes/mes', en: 'Up to 100 receipts/month' },
+  'plan.basic.feature2':  { es: 'Hasta 5 conductores', en: 'Up to 5 drivers' },
+  'plan.basic.feature3':  { es: 'Soporte por correo',  en: 'Email support' },
+  'plan.pro.feature1':    { es: 'Hasta 500 comprobantes/mes', en: 'Up to 500 receipts/month' },
+  'plan.pro.feature2':    { es: 'Hasta 20 conductores', en: 'Up to 20 drivers' },
+  'plan.pro.feature3':    { es: 'Soporte prioritario', en: 'Priority support' },
+  'plan.enterprise.feature1': { es: 'Hasta 2,000 comprobantes/mes', en: 'Up to 2,000 receipts/month' },
+  'plan.enterprise.feature2': { es: 'Conductores ilimitados', en: 'Unlimited drivers' },
+  'plan.enterprise.feature3': { es: 'Soporte 24/7',    en: '24/7 support' },
+  'plan.corporate.feature1':  { es: 'Comprobantes ilimitados', en: 'Unlimited receipts' },
+  'plan.corporate.feature2':  { es: 'Conductores ilimitados', en: 'Unlimited drivers' },
+  'plan.corporate.feature3':  { es: 'Soporte dedicado + API', en: 'Dedicated support + API' },
 
   /* ── Generic ── */
   'loading':              { es: 'Cargando...',         en: 'Loading…' },
@@ -198,12 +244,20 @@ function setLang(code) {
 /**
  * Translate a key into the current language.
  * Falls back to the key name if not found.
+ * Supports simple {placeholder} substitution via the second argument.
  */
-function __(key) {
+function __(key, replacements) {
   const lang = getLang();
   const entry = TRANSLATIONS[key];
-  if (!entry) return key; // fallback to key
-  return entry[lang] || entry['es'] || key;
+  let text = entry
+    ? (entry[lang] || entry['es'] || key)
+    : key;
+  if (replacements) {
+    Object.entries(replacements).forEach(([k, v]) => {
+      text = text.replace(new RegExp('\\{' + k + '\\}', 'g'), v);
+    });
+  }
+  return text;
 }
 
 /**
