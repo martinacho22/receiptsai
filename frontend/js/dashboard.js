@@ -33,7 +33,7 @@ async function renderDashboard(container) {
       if (!driverTotals[r.driver_id]) {
         driverTotals[r.driver_id] = {
           driver_id: r.driver_id,
-          driver_name: r.driver_name || 'Sin nombre',
+          driver_name: r.driver_name || __('driver.unnamed'),
           total: 0,
           pending: 0,
           approved: 0,
@@ -75,7 +75,7 @@ async function renderDashboard(container) {
           <div class="kpi-sub">${formatCurrency(summary.paid_amount)}</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Rechazados</div>
+          <div class="kpi-label">${__('dashboard.rejected')}</div>
           <div class="kpi-value" style="color:var(--danger)">${summary.total_rejected || 0}</div>
           <div class="kpi-sub">${formatCurrency(summary.rejected_amount)}</div>
         </div>
@@ -97,7 +97,7 @@ async function renderDashboard(container) {
               <th class="text-right">${__("dashboard.pending_amount")}</th>
               <th class="text-right">${__("dashboard.approved_amount")}</th>
               <th class="text-right">${__("dashboard.paid_amount")}</th>
-              <th class="text-right">Rechazado</th>
+              <th class="text-right">${__("dashboard.rejected_amount")}</th>
             </tr>
           </thead>
           <tbody>
